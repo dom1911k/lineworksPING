@@ -1,0 +1,37 @@
+name: Build APK
+
+# Builds the debug APK on GitHub's runners (which have the Android SDK and
+# unrestricted network) and uploads it as a downloadable artifact.
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineworks-ping-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
