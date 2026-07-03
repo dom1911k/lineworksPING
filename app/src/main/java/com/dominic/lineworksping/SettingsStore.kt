@@ -69,6 +69,31 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_FULLSCREEN, true)
         set(v) = prefs.edit().putBoolean(KEY_FULLSCREEN, v).apply()
 
+    /** Full-screen alert colour style: 0 rainbow, 1 warm, 2 cool, 3 solid red. */
+    var alertColor: Int
+        get() = prefs.getInt(KEY_ALERT_COLOR, 0)
+        set(v) = prefs.edit().putInt(KEY_ALERT_COLOR, v).apply()
+
+    /** Colour-cycling speed: 0 slow, 1 medium, 2 fast. */
+    var alertSpeed: Int
+        get() = prefs.getInt(KEY_ALERT_SPEED, 1)
+        set(v) = prefs.edit().putInt(KEY_ALERT_SPEED, v).apply()
+
+    /** Alert text size: 0 normal, 1 large, 2 huge. */
+    var alertTextSize: Int
+        get() = prefs.getInt(KEY_ALERT_TEXT, 0)
+        set(v) = prefs.edit().putInt(KEY_ALERT_TEXT, v).apply()
+
+    /** Whether the full-screen alert vibrates. */
+    var alertVibrate: Boolean
+        get() = prefs.getBoolean(KEY_ALERT_VIB, true)
+        set(v) = prefs.edit().putBoolean(KEY_ALERT_VIB, v).apply()
+
+    /** Whether the full-screen alert text pulses. */
+    var alertPulse: Boolean
+        get() = prefs.getBoolean(KEY_ALERT_PULSE, true)
+        set(v) = prefs.edit().putBoolean(KEY_ALERT_PULSE, v).apply()
+
     companion object {
         private const val PREFS = "lineworks_ping_prefs"
         private const val KEY_ENABLED = "enabled"
@@ -81,5 +106,10 @@ class SettingsStore(context: Context) {
         private const val KEY_BYPASS_DND = "bypass_dnd"
         private const val KEY_LOG_ALL = "log_all_apps"
         private const val KEY_FULLSCREEN = "fullscreen_alert"
+        private const val KEY_ALERT_COLOR = "alert_color"
+        private const val KEY_ALERT_SPEED = "alert_speed"
+        private const val KEY_ALERT_TEXT = "alert_text_size"
+        private const val KEY_ALERT_VIB = "alert_vibrate"
+        private const val KEY_ALERT_PULSE = "alert_pulse"
     }
 }

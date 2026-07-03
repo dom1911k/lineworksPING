@@ -1,10 +1,12 @@
 package com.dominic.lineworksping
 
 import android.animation.ValueAnimator
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.Animation
@@ -13,43 +15,55 @@ import androidx.appcompat.app.AppCompatActivity
 import com.dominic.lineworksping.databinding.ActivityAlertBinding
 
 /**
- * A deliberately loud, full-screen alert: a color-cycling background, pulsing
- * text, and a strong vibration. Shown over the lock screen via a notification's
- * full-screen intent so an important message is impossible to miss.
+ * A deliberately loud, full-screen alert whose look is driven by the user's
+ * settings: colour style, cycling speed, text size, vibration, and pulsing.
+ * Shown over the lock screen via a notification's full-screen intent.
  */
 class AlertActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAlertBinding
+    private lateinit var settings: SettingsStore
     private var colorAnimator: ValueAnimator? = null
     private var vibrator: Vibrator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        settings = SettingsStore(this)
         showOverLockScreen()
         binding = ActivityAlertBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        bindContent(intent)
+        applyTextSize()
+        binding.btnDismiss.setOnClickListener { finish() }
+
+        startColorCycle()
+        if (settings.alertPulse) pulse(binding.alertTitle)
+        if (settings.alertVibrate) startVibration()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        bindContent(intent)
+    }
+
+    private fun bindContent(intent: Intent) {
         val title = intent.getStringExtra(EXTRA_TITLE).orEmpty()
         val text = intent.getStringExtra(EXTRA_TEXT).orEmpty()
         binding.alertTitle.text = title.ifBlank { getString(R.string.app_name) }
         binding.alertText.text = text
         binding.alertText.visibility = if (text.isBlank()) View.GONE else View.VISIBLE
-
-        binding.btnDismiss.setOnClickListener { finish() }
-
-        startColorCycle()
-        pulse(binding.alertTitle)
-        startVibration()
     }
 
-    override fun onNewIntent(intent: android.content.Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        binding.alertTitle.text = intent.getStringExtra(EXTRA_TITLE)?.ifBlank { getString(R.string.app_name) }
-            ?: getString(R.string.app_name)
-        val text = intent.getStringExtra(EXTRA_TEXT).orEmpty()
-        binding.alertText.text = text
-        binding.alertText.visibility = if (text.isBlank()) View.GONE else View.VISIBLE
+    private fun applyTextSize() {
+        val (titleSp, bodySp) = when (settings.alertTextSize) {
+            1 -> 44f to 27f
+            2 -> 54f to 33f
+            else -> 34f to 22f
+        }
+        binding.alertTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, titleSp)
+        binding.alertText.setTextSize(TypedValue.COMPLEX_UNIT_SP, bodySp)
     }
 
     private fun showOverLockScreen() {
@@ -67,16 +81,35 @@ class AlertActivity : AppCompatActivity() {
     }
 
     private fun startColorCycle() {
-        colorAnimator = ValueAnimator.ofArgb(
-            0xFFFF1744.toInt(), // red
-            0xFFFF9100.toInt(), // orange
-            0xFFFFEA00.toInt(), // yellow
-            0xFF00E676.toInt(), // green
-            0xFF00B0FF.toInt(), // blue
-            0xFFD500F9.toInt(), // magenta
-            0xFFFF1744.toInt()  // back to red for a seamless loop
-        ).apply {
-            duration = 2500
+        val colors: IntArray? = when (settings.alertColor) {
+            1 -> intArrayOf( // warm
+                0xFFFF1744.toInt(), 0xFFFF6D00.toInt(), 0xFFFFEA00.toInt(),
+                0xFFFF3D00.toInt(), 0xFFFF1744.toInt()
+            )
+            2 -> intArrayOf( // cool
+                0xFF2979FF.toInt(), 0xFF00E5FF.toInt(), 0xFF00E676.toInt(),
+                0xFFD500F9.toInt(), 0xFF2979FF.toInt()
+            )
+            3 -> null // solid red, no cycling
+            else -> intArrayOf( // rainbow
+                0xFFFF1744.toInt(), 0xFFFF9100.toInt(), 0xFFFFEA00.toInt(),
+                0xFF00E676.toInt(), 0xFF00B0FF.toInt(), 0xFFD500F9.toInt(),
+                0xFFFF1744.toInt()
+            )
+        }
+
+        if (colors == null) {
+            binding.root.setBackgroundColor(0xFFFF1744.toInt())
+            return
+        }
+
+        val duration = when (settings.alertSpeed) {
+            0 -> 4200L
+            2 -> 1100L
+            else -> 2500L
+        }
+        colorAnimator = ValueAnimator.ofArgb(*colors).apply {
+            this.duration = duration
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener { binding.root.setBackgroundColor(it.animatedValue as Int) }
             start()

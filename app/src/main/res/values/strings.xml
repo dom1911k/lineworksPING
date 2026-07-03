@@ -42,6 +42,29 @@
     <string name="fsi_needed">Full-screen alerts: not allowed — tap below to allow (Android 14+).</string>
     <string name="allow_fullscreen">Allow full-screen alerts</string>
     <string name="alert_dismiss">Dismiss</string>
+    <string name="alert_color_label">Colour style</string>
+    <string name="alert_speed_label">Colour-cycling speed</string>
+    <string name="alert_textsize_label">Text size</string>
+    <string name="alert_vibrate">Vibrate</string>
+    <string name="alert_pulse">Pulsing text</string>
+    <string name="preview_alert">Preview alert</string>
+
+    <string-array name="alert_colors">
+        <item>Rainbow</item>
+        <item>Warm (reds/oranges)</item>
+        <item>Cool (blues/greens)</item>
+        <item>Solid red (no cycling)</item>
+    </string-array>
+    <string-array name="alert_speeds">
+        <item>Slow</item>
+        <item>Medium</item>
+        <item>Fast</item>
+    </string-array>
+    <string-array name="alert_text_sizes">
+        <item>Normal</item>
+        <item>Large</item>
+        <item>Huge</item>
+    </string-array>
 
     <string name="section_dnd">6. Do Not Disturb</string>
     <string name="rule_bypass_dnd">Let important pings through Do Not Disturb</string>

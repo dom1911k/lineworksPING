@@ -11,6 +11,9 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -60,6 +63,9 @@ class MainActivity : AppCompatActivity() {
         binding.switchDm.setOnCheckedChangeListener { _, v -> settings.dmImportant = v }
         binding.switchLogAll.setOnCheckedChangeListener { _, v -> settings.logAllApps = v }
         binding.switchFullScreen.setOnCheckedChangeListener { _, v -> settings.fullScreenAlert = v }
+        binding.switchAlertVibrate.setOnCheckedChangeListener { _, v -> settings.alertVibrate = v }
+        binding.switchAlertPulse.setOnCheckedChangeListener { _, v -> settings.alertPulse = v }
+        setupAlertSpinners()
         binding.switchBypassDnd.setOnCheckedChangeListener { _, v ->
             settings.bypassDnd = v
             Notifier.ensureChannel(this, settings)
@@ -82,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
         }
         binding.btnFsiGrant.setOnClickListener { openFullScreenIntentSettings() }
+        binding.btnPreviewAlert.setOnClickListener { previewAlert() }
         binding.btnCheckUpdate.setOnClickListener { checkForUpdate() }
     }
 
@@ -94,6 +101,11 @@ class MainActivity : AppCompatActivity() {
         binding.switchLogAll.isChecked = settings.logAllApps
         binding.switchBypassDnd.isChecked = settings.bypassDnd
         binding.switchFullScreen.isChecked = settings.fullScreenAlert
+        binding.switchAlertVibrate.isChecked = settings.alertVibrate
+        binding.switchAlertPulse.isChecked = settings.alertPulse
+        binding.spinnerColor.setSelection(settings.alertColor)
+        binding.spinnerSpeed.setSelection(settings.alertSpeed)
+        binding.spinnerTextSize.setSelection(settings.alertTextSize)
         binding.editKeywords.setText(settings.keywordsRaw)
         Notifier.ensureChannel(this, settings)
         updateSoundLabel()
@@ -143,6 +155,35 @@ class MainActivity : AppCompatActivity() {
         if (!shown) {
             Toast.makeText(this, R.string.test_blocked, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun setupAlertSpinners() {
+        bindSpinner(binding.spinnerColor, R.array.alert_colors) { settings.alertColor = it }
+        bindSpinner(binding.spinnerSpeed, R.array.alert_speeds) { settings.alertSpeed = it }
+        bindSpinner(binding.spinnerTextSize, R.array.alert_text_sizes) { settings.alertTextSize = it }
+    }
+
+    private fun bindSpinner(spinner: Spinner, arrayRes: Int, onSelected: (Int) -> Unit) {
+        val adapter = ArrayAdapter.createFromResource(
+            this, arrayRes, android.R.layout.simple_spinner_item
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                onSelected(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun previewAlert() {
+        startActivity(
+            Intent(this, AlertActivity::class.java)
+                .putExtra(AlertActivity.EXTRA_TITLE, getString(R.string.test_title))
+                .putExtra(AlertActivity.EXTRA_TEXT, getString(R.string.test_body))
+        )
     }
 
     private fun openFullScreenIntentSettings() {
