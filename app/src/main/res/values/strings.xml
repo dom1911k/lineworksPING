@@ -90,7 +90,10 @@
     <string name="open_settings">Open settings</string>
 
     <string name="title_recent">Recent activity</string>
-    <string name="recent_hint">Notifications the app has seen recently and how each was handled. A 🔔 means it triggered a ping. Use this to check LINE WORKS is being detected and tune your rules.</string>
+    <string name="recent_hint">Notifications the app has seen recently and how each was handled. A 🔔 means it triggered a ping. Tap any item to see the raw details (including the DM-vs-group signal). Use this to check LINE WORKS is detected and tune your rules.</string>
+    <string name="detail_title">Notification details</string>
+    <string name="copy">Copy</string>
+    <string name="copied">Copied to clipboard</string>
     <string name="recent_empty">Nothing yet. Make sure notification access is granted and LINE WORKS is selected under “Apps to watch”, then send yourself a message. Turn on the troubleshoot toggle to log every app.</string>
     <string name="refresh">Refresh</string>
     <string name="clear_log">Clear</string>

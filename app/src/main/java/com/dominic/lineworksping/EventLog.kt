@@ -14,7 +14,8 @@ object EventLog {
         val label: String,
         val text: String,
         val decision: String,
-        val pinged: Boolean
+        val pinged: Boolean,
+        val detail: String = ""
     )
 
     private const val MAX = 80

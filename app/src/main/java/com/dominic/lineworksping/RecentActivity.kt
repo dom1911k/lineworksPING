@@ -1,11 +1,16 @@
 package com.dominic.lineworksping
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -77,6 +82,22 @@ class RecentActivity : AppCompatActivity() {
                 e.text.takeIf { it.isNotBlank() && (head != null) },
                 time.toString()
             ).joinToString("  •  ")
+
+            holder.itemView.setOnClickListener { showDetail(e) }
         }
+    }
+
+    private fun showDetail(e: EventLog.Entry) {
+        val body = e.detail.ifBlank { e.text.ifBlank { e.decision } }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.detail_title)
+            .setMessage(body)
+            .setPositiveButton(android.R.string.ok, null)
+            .setNeutralButton(R.string.copy) { _, _ ->
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newPlainText("notification detail", body))
+                Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 }

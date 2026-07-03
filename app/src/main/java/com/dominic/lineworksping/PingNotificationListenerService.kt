@@ -79,7 +79,8 @@ class PingNotificationListenerService : NotificationListenerService() {
                         }
                     }.take(140),
                     decision = decision,
-                    pinged = pinged
+                    pinged = pinged,
+                    detail = buildDetail(sbn, decision)
                 )
             )
         } catch (e: Exception) {
@@ -93,6 +94,26 @@ class PingNotificationListenerService : NotificationListenerService() {
         val text = (extras.getCharSequence(Notification.EXTRA_TEXT)
             ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT))?.toString().orEmpty()
         return title to text
+    }
+
+    /** A raw dump of the notification's key fields, used to diagnose DM vs group. */
+    private fun buildDetail(sbn: StatusBarNotification, decision: String): String {
+        val e = sbn.notification?.extras ?: return ""
+        val hasGroupFlag = e.containsKey(Notification.EXTRA_IS_GROUP_CONVERSATION)
+        val isGroup = e.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION, false)
+        return buildString {
+            appendLine("package: ${sbn.packageName}")
+            appendLine("decision: $decision")
+            appendLine("category: ${sbn.notification?.category}")
+            appendLine("template: ${e.getString(Notification.EXTRA_TEMPLATE)}")
+            appendLine("isGroupConversation: ${if (hasGroupFlag) isGroup.toString() else "(not set)"}")
+            appendLine("hasMessagingStyle: ${e.containsKey(Notification.EXTRA_MESSAGES)}")
+            appendLine("title: ${e.getCharSequence(Notification.EXTRA_TITLE)}")
+            appendLine("text: ${e.getCharSequence(Notification.EXTRA_TEXT)}")
+            appendLine("bigText: ${e.getCharSequence(Notification.EXTRA_BIG_TEXT)}")
+            appendLine("subText: ${e.getCharSequence(Notification.EXTRA_SUB_TEXT)}")
+            appendLine("conversationTitle: ${e.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)}")
+        }.trimEnd()
     }
 
     private fun appLabel(pkg: String): String = try {
