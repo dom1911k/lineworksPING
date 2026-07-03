@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -34,7 +33,7 @@
             android:text="@string/enable_app"
             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
-        <!-- Step 1: notification access -->
+        <!-- Step 1: notification access + pop-up permission -->
         <TextView
             style="@style/SectionHeader"
             android:text="@string/section_access" />
@@ -53,7 +52,23 @@
             android:layout_marginTop="8dp"
             android:text="@string/open_access_settings" />
 
-        <!-- Step 2: which apps -->
+        <TextView
+            android:id="@+id/textNotifStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            tools:text="Pop-up notifications: enabled" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNotifSettings"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/open_notif_settings" />
+
+        <!-- Step 2: which apps + diagnostics -->
         <TextView
             style="@style/SectionHeader"
             android:text="@string/section_apps" />
@@ -65,12 +80,27 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             tools:text="0 apps monitored" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPickApps"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/choose_apps" />
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPickApps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_apps" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRecent"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/recent_activity" />
+
+        </LinearLayout>
 
         <!-- Step 3: what counts as important -->
         <TextView
@@ -115,6 +145,13 @@
             android:layout_marginTop="4dp"
             android:text="@string/rule_require_at" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchLogAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/rule_log_all" />
+
         <!-- Step 4: the sound -->
         <TextView
             style="@style/SectionHeader"
@@ -145,9 +182,56 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@string/test_sound" />
+                android:text="@string/test_ping" />
 
         </LinearLayout>
+
+        <!-- Step 5: Do Not Disturb -->
+        <TextView
+            style="@style/SectionHeader"
+            android:text="@string/section_dnd" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchBypassDnd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/rule_bypass_dnd" />
+
+        <TextView
+            android:id="@+id/textDndStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            tools:text="Do Not Disturb access: not granted" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDndAccess"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/open_dnd_settings" />
+
+        <!-- Step 6: updates -->
+        <TextView
+            style="@style/SectionHeader"
+            android:text="@string/section_updates" />
+
+        <TextView
+            android:id="@+id/textVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            tools:text="Installed version: 1.0" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCheckUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/check_updates" />
 
         <Space
             android:layout_width="match_parent"

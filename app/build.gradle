@@ -11,12 +11,15 @@ android {
         applicationId "com.dominic.lineworksping"
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        // CI passes -PappVersionCode / -PappVersionName so each published build gets a
+        // higher versionCode; local builds default to 1 / "1.0".
+        versionCode (project.findProperty('appVersionCode') ?: '1').toString().toInteger()
+        versionName (project.findProperty('appVersionName') ?: '1.0').toString()
     }
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     buildTypes {

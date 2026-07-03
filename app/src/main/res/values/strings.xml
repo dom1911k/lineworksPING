@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">LINE WORKS Ping</string>
-    <string name="app_tagline">Plays a sound only when a message actually matters — a DM or an @mention of you.</string>
+    <string name="app_tagline">Pops up a notification and plays a sound only when a message actually matters — a DM or an @mention of you.</string>
 
     <string name="enable_app">Enabled</string>
 
@@ -8,9 +8,13 @@
     <string name="open_access_settings">Open access settings</string>
     <string name="access_granted">Notification access: granted ✓</string>
     <string name="access_not_granted">Notification access: NOT granted — tap below and enable “LINE WORKS Ping”.</string>
+    <string name="notif_enabled">Pop-up notifications: allowed ✓</string>
+    <string name="notif_disabled">Pop-up notifications: BLOCKED — tap below and allow notifications (and set them to pop on screen).</string>
+    <string name="open_notif_settings">Notification settings</string>
 
     <string name="section_apps">2. Apps to watch</string>
     <string name="choose_apps">Choose apps</string>
+    <string name="recent_activity">Recent activity</string>
     <string name="title_pick_apps">Choose apps to watch</string>
     <string name="pick_apps_hint">Tap the apps whose messages should be checked — e.g. LINE WORKS. Changes save automatically.</string>
 
@@ -18,15 +22,59 @@
     <string name="rule_dm">Direct messages (1:1 chats)</string>
     <string name="rule_mention">@mentions of my name / keywords</string>
     <string name="rule_require_at">Only match keywords written as “@keyword”</string>
+    <string name="rule_log_all">Troubleshoot: log every app’s notifications in Recent activity</string>
     <string name="hint_keywords">Your name(s) / keywords</string>
     <string name="help_keywords">Separate multiple keywords with commas or new lines.</string>
 
     <string name="section_sound">4. Alert sound</string>
     <string name="choose_sound">Choose sound</string>
-    <string name="test_sound">Test</string>
+    <string name="test_ping">Test ping</string>
     <string name="pick_sound">Choose alert sound</string>
     <string name="current_sound">Sound: %1$s</string>
     <string name="default_sound">Default notification sound</string>
+    <string name="test_title">Test ping</string>
+    <string name="test_body">If you can see and hear this, important messages will alert you the same way.</string>
+    <string name="test_blocked">Couldn’t show the notification. Enable pop-up notifications in section 1.</string>
+
+    <string name="section_dnd">5. Do Not Disturb</string>
+    <string name="rule_bypass_dnd">Let important pings through Do Not Disturb</string>
+    <string name="dnd_granted">Do Not Disturb access: granted ✓ — pings will pierce DND.</string>
+    <string name="dnd_needed">Do Not Disturb access: NOT granted — tap below and allow it so pings work during DND.</string>
+    <string name="dnd_off">Pings will be silenced while Do Not Disturb is on.</string>
+    <string name="open_dnd_settings">Grant Do Not Disturb access</string>
+
+    <string name="section_updates">6. Updates</string>
+    <string name="current_version">Installed version: %1$s</string>
+    <string name="check_updates">Check for updates</string>
+    <string name="checking_updates">Checking for updates…</string>
+    <string name="up_to_date">You’re on the latest version.</string>
+    <string name="update_failed_title">Update check failed</string>
+    <string name="update_available_title">Update available</string>
+    <string name="update_available_body">A newer version (%1$s) is available. You have %2$s.\n\nDownload and install it now?</string>
+    <string name="update_now">Update now</string>
+    <string name="downloading_update">Downloading update…</string>
+    <string name="download_failed">Download failed. Check your connection and try again.</string>
+    <string name="install_failed">Couldn’t open the installer.</string>
+    <string name="allow_install_title">Allow installing updates</string>
+    <string name="allow_install_body">To install updates, allow this app to install unknown apps, then tap “Update now” again.</string>
+    <string name="open_settings">Open settings</string>
+
+    <string name="title_recent">Recent activity</string>
+    <string name="recent_hint">Notifications the app has seen recently and how each was handled. A 🔔 means it triggered a ping. Use this to check LINE WORKS is being detected and tune your rules.</string>
+    <string name="recent_empty">Nothing yet. Make sure notification access is granted and LINE WORKS is selected under “Apps to watch”, then send yourself a message. Turn on the troubleshoot toggle to log every app.</string>
+    <string name="refresh">Refresh</string>
+    <string name="clear_log">Clear</string>
+
+    <string name="log_listener_connected">Listener connected — the app is now watching notifications.</string>
+    <string name="log_listener_disconnected">Listener disconnected — notification access may have been revoked.</string>
+    <string name="decision_not_monitored">seen (app not in your watch list)</string>
+    <string name="decision_group_summary">group summary (skipped)</string>
+    <string name="decision_ping_dm">PING · direct message</string>
+    <string name="decision_ping_mention">PING · @mention</string>
+    <string name="decision_normal">normal — no ping</string>
+
+    <string name="channel_name">Important messages</string>
+    <string name="channel_desc">Heads-up alerts for direct messages and @mentions.</string>
 
     <plurals name="monitored_apps">
         <item quantity="one">%d app monitored</item>

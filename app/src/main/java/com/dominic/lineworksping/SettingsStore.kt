@@ -54,6 +54,16 @@ class SettingsStore(context: Context) {
         get() = prefs.getString(KEY_SOUND, null)
         set(v) = prefs.edit().putString(KEY_SOUND, v).apply()
 
+    /** Whether important pings should pierce Do Not Disturb. */
+    var bypassDnd: Boolean
+        get() = prefs.getBoolean(KEY_BYPASS_DND, true)
+        set(v) = prefs.edit().putBoolean(KEY_BYPASS_DND, v).apply()
+
+    /** Troubleshooting: record every notification (not just monitored apps) in the log. */
+    var logAllApps: Boolean
+        get() = prefs.getBoolean(KEY_LOG_ALL, false)
+        set(v) = prefs.edit().putBoolean(KEY_LOG_ALL, v).apply()
+
     companion object {
         private const val PREFS = "lineworks_ping_prefs"
         private const val KEY_ENABLED = "enabled"
@@ -63,5 +73,7 @@ class SettingsStore(context: Context) {
         private const val KEY_REQUIRE_AT = "require_at"
         private const val KEY_DM = "dm_important"
         private const val KEY_SOUND = "sound_uri"
+        private const val KEY_BYPASS_DND = "bypass_dnd"
+        private const val KEY_LOG_ALL = "log_all_apps"
     }
 }

@@ -6,6 +6,12 @@
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
+    <!-- Post the heads-up alert notifications. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- In-app updates: fetch release info and download/install the new APK. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:allowBackup="true"
@@ -30,6 +36,12 @@
             android:label="@string/title_pick_apps"
             android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".RecentActivity"
+            android:exported="false"
+            android:label="@string/title_recent"
+            android:parentActivityName=".MainActivity" />
+
         <!-- The notification listener. The system binds this; the BIND permission gates it. -->
         <service
             android:name=".PingNotificationListenerService"
@@ -40,6 +52,17 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!-- Serves the downloaded APK to the system installer. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

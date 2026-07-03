@@ -1,14 +1,15 @@
 name: Build APK
 
 # Builds the debug APK on GitHub's runners (which have the Android SDK and
-# unrestricted network) and uploads it as a downloadable artifact.
+# unrestricted network), uploads it as an artifact, AND publishes it as a
+# GitHub Release asset so the app's built-in updater can find and install it.
 on:
   push:
     branches: ["**"]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -26,12 +27,38 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      # Use the run number as a monotonically increasing versionCode so the
+      # in-app updater can tell newer builds apart.
+      - name: Compute version
+        id: ver
+        run: |
+          echo "code=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "name=1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
-      - name: Upload APK
+      - name: Build debug APK
+        run: >
+          ./gradlew assembleDebug --no-daemon --stacktrace
+          -PappVersionCode=${{ steps.ver.outputs.code }}
+          -PappVersionName=${{ steps.ver.outputs.name }}
+
+      # The updater parses the versionCode from the digits right before ".apk".
+      - name: Stage APK
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "dist/lineworks-ping-${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.code }}.apk"
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: lineworks-ping-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: dist/*.apk
           if-no-files-found: error
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.name }}
+          name: LINE WORKS Ping ${{ steps.ver.outputs.name }}
+          files: dist/*.apk
+          make_latest: "true"
