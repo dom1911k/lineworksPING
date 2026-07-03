@@ -186,7 +186,35 @@
 
         </LinearLayout>
 
-        <!-- Step 5: Do Not Disturb -->
+        <!-- Step 5: full-screen takeover alert -->
+        <TextView
+            style="@style/SectionHeader"
+            android:text="@string/section_fullscreen" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchFullScreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/rule_fullscreen" />
+
+        <TextView
+            android:id="@+id/textFsiStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            tools:text="Full-screen alerts: allowed" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFsiGrant"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/allow_fullscreen" />
+
+        <!-- Step 6: Do Not Disturb -->
         <TextView
             style="@style/SectionHeader"
             android:text="@string/section_dnd" />
@@ -214,7 +242,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/open_dnd_settings" />
 
-        <!-- Step 6: updates -->
+        <!-- Step 7: updates -->
         <TextView
             style="@style/SectionHeader"
             android:text="@string/section_updates" />

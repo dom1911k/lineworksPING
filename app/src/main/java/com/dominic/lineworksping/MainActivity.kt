@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         binding.switchRequireAt.setOnCheckedChangeListener { _, v -> settings.requireAtSymbol = v }
         binding.switchDm.setOnCheckedChangeListener { _, v -> settings.dmImportant = v }
         binding.switchLogAll.setOnCheckedChangeListener { _, v -> settings.logAllApps = v }
+        binding.switchFullScreen.setOnCheckedChangeListener { _, v -> settings.fullScreenAlert = v }
         binding.switchBypassDnd.setOnCheckedChangeListener { _, v ->
             settings.bypassDnd = v
             Notifier.ensureChannel(this, settings)
@@ -79,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnDndAccess.setOnClickListener {
             startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
         }
+        binding.btnFsiGrant.setOnClickListener { openFullScreenIntentSettings() }
         binding.btnCheckUpdate.setOnClickListener { checkForUpdate() }
     }
 
@@ -90,6 +93,7 @@ class MainActivity : AppCompatActivity() {
         binding.switchDm.isChecked = settings.dmImportant
         binding.switchLogAll.isChecked = settings.logAllApps
         binding.switchBypassDnd.isChecked = settings.bypassDnd
+        binding.switchFullScreen.isChecked = settings.fullScreenAlert
         binding.editKeywords.setText(settings.keywordsRaw)
         Notifier.ensureChannel(this, settings)
         updateSoundLabel()
@@ -97,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         updateAccessStatus()
         updateNotifStatus()
         updateDndStatus()
+        updateFsiStatus()
         binding.textVersion.text = getString(R.string.current_version, BuildConfig.VERSION_NAME)
     }
 
@@ -126,9 +131,46 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.test_title),
             getString(R.string.test_body)
         )
+        // The full-screen intent only fires when the screen is off/locked, so launch
+        // the alert directly here to preview it while the app is open.
+        if (settings.fullScreenAlert) {
+            startActivity(
+                Intent(this, AlertActivity::class.java)
+                    .putExtra(AlertActivity.EXTRA_TITLE, getString(R.string.test_title))
+                    .putExtra(AlertActivity.EXTRA_TEXT, getString(R.string.test_body))
+            )
+        }
         if (!shown) {
             Toast.makeText(this, R.string.test_blocked, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun openFullScreenIntentSettings() {
+        if (Build.VERSION.SDK_INT >= 34) {
+            try {
+                startActivity(
+                    Intent(
+                        Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
+                        Uri.parse("package:$packageName")
+                    )
+                )
+            } catch (e: Exception) {
+                openAppNotificationSettings()
+            }
+        }
+    }
+
+    private fun updateFsiStatus() {
+        val allowed = if (Build.VERSION.SDK_INT >= 34) {
+            getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
+        } else {
+            true
+        }
+        binding.textFsiStatus.text = getString(
+            if (allowed) R.string.fsi_allowed else R.string.fsi_needed
+        )
+        binding.btnFsiGrant.visibility =
+            if (Build.VERSION.SDK_INT >= 34 && !allowed) View.VISIBLE else View.GONE
     }
 
     private fun updateSoundLabel() {

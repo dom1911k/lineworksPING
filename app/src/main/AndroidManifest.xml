@@ -11,6 +11,9 @@
     <!-- Required for the app to appear in, and be granted, "Do Not Disturb access"
          so its important pings can bypass DND. -->
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <!-- Full-screen takeover alert + its vibration. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <!-- In-app updates: fetch release info and download/install the new APK. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -44,6 +47,16 @@
             android:exported="false"
             android:label="@string/title_recent"
             android:parentActivityName=".MainActivity" />
+
+        <!-- Full-screen takeover alert; shows over the lock screen. -->
+        <activity
+            android:name=".AlertActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.LineWorksPing" />
 
         <!-- The notification listener. The system binds this; the BIND permission gates it. -->
         <service

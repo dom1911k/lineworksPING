@@ -83,6 +83,7 @@ object Notifier {
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setColor(0xFFFF1744.toInt())
             .setAutoCancel(true)
             .setContentIntent(contentIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -90,6 +91,20 @@ object Notifier {
             .setSound(PingPlayer.resolveUri(settings))
             .setVibrate(vibration)
             .setDefaults(NotificationCompat.DEFAULT_LIGHTS)
+
+        // Full-screen takeover: launches AlertActivity, and pops over the lock screen.
+        if (settings.fullScreenAlert) {
+            val fsIntent = Intent(context, AlertActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra(AlertActivity.EXTRA_TITLE, title)
+                putExtra(AlertActivity.EXTRA_TEXT, text)
+            }
+            val fsPendingIntent = PendingIntent.getActivity(
+                context, 1, fsIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            builder.setFullScreenIntent(fsPendingIntent, true)
+        }
 
         return try {
             if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false

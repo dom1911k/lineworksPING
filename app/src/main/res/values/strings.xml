@@ -36,14 +36,21 @@
     <string name="test_body">If you can see and hear this, important messages will alert you the same way.</string>
     <string name="test_blocked">Couldn’t show the notification. Enable pop-up notifications in section 1.</string>
 
-    <string name="section_dnd">5. Do Not Disturb</string>
+    <string name="section_fullscreen">5. Full-screen alert</string>
+    <string name="rule_fullscreen">Show a full-screen colourful alert that takes over the screen</string>
+    <string name="fsi_allowed">Full-screen alerts: allowed ✓</string>
+    <string name="fsi_needed">Full-screen alerts: not allowed — tap below to allow (Android 14+).</string>
+    <string name="allow_fullscreen">Allow full-screen alerts</string>
+    <string name="alert_dismiss">Dismiss</string>
+
+    <string name="section_dnd">6. Do Not Disturb</string>
     <string name="rule_bypass_dnd">Let important pings through Do Not Disturb</string>
     <string name="dnd_granted">Do Not Disturb access: granted ✓ — pings will pierce DND.</string>
     <string name="dnd_needed">Do Not Disturb access: NOT granted — tap below and allow it so pings work during DND.</string>
     <string name="dnd_off">Pings will be silenced while Do Not Disturb is on.</string>
     <string name="open_dnd_settings">Grant Do Not Disturb access</string>
 
-    <string name="section_updates">6. Updates</string>
+    <string name="section_updates">7. Updates</string>
     <string name="current_version">Installed version: %1$s</string>
     <string name="check_updates">Check for updates</string>
     <string name="checking_updates">Checking for updates…</string>

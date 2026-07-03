@@ -64,6 +64,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_LOG_ALL, false)
         set(v) = prefs.edit().putBoolean(KEY_LOG_ALL, v).apply()
 
+    /** Whether to also show the full-screen colourful takeover alert. */
+    var fullScreenAlert: Boolean
+        get() = prefs.getBoolean(KEY_FULLSCREEN, true)
+        set(v) = prefs.edit().putBoolean(KEY_FULLSCREEN, v).apply()
+
     companion object {
         private const val PREFS = "lineworks_ping_prefs"
         private const val KEY_ENABLED = "enabled"
@@ -75,5 +80,6 @@ class SettingsStore(context: Context) {
         private const val KEY_SOUND = "sound_uri"
         private const val KEY_BYPASS_DND = "bypass_dnd"
         private const val KEY_LOG_ALL = "log_all_apps"
+        private const val KEY_FULLSCREEN = "fullscreen_alert"
     }
 }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF1744"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="28dp">
+
+    <ImageView
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_stat_ping" />
+
+    <TextView
+        android:id="@+id/alertTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="6"
+        android:textColor="#FFFFFF"
+        android:textSize="34sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/alertText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:maxLines="6"
+        android:ellipsize="end"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="6"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp" />
+
+    <Button
+        android:id="@+id/btnDismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="#FFFFFF"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
+        android:text="@string/alert_dismiss"
+        android:textColor="#000000"
+        android:textStyle="bold" />
+
+</LinearLayout>
