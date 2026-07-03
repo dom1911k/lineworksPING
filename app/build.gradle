@@ -3,6 +3,12 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+// CI passes -PappVersionCode / -PappVersionName so each published build gets a
+// higher versionCode; local builds default to 1 / "1.0". Computed as plain
+// variables here to avoid Groovy parsing `versionCode (expr)` as a method call.
+def appVersionCode = (project.findProperty('appVersionCode') ?: '1').toString().toInteger()
+def appVersionName = (project.findProperty('appVersionName') ?: '1.0').toString()
+
 android {
     namespace 'com.dominic.lineworksping'
     compileSdk 34
@@ -11,10 +17,8 @@ android {
         applicationId "com.dominic.lineworksping"
         minSdk 26
         targetSdk 34
-        // CI passes -PappVersionCode / -PappVersionName so each published build gets a
-        // higher versionCode; local builds default to 1 / "1.0".
-        versionCode (project.findProperty('appVersionCode') ?: '1').toString().toInteger()
-        versionName (project.findProperty('appVersionName') ?: '1.0').toString()
+        versionCode appVersionCode
+        versionName appVersionName
     }
 
     buildFeatures {
