@@ -81,7 +81,7 @@ object UpdateManager {
                 setRequestProperty("Accept", "application/octet-stream")
             }
             conn.inputStream.use { input ->
-                out.outputStream.use { output -> input.copyTo(output) }
+                out.outputStream().use { output -> input.copyTo(output) }
             }
             conn.disconnect()
             if (out.length() > 0) out else null
