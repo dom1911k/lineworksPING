@@ -8,6 +8,9 @@
         tools:ignore="QueryAllPackagesPermission" />
     <!-- Post the heads-up alert notifications. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Required for the app to appear in, and be granted, "Do Not Disturb access"
+         so its important pings can bypass DND. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <!-- In-app updates: fetch release info and download/install the new APK. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
