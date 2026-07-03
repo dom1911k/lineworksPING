@@ -13,9 +13,9 @@ enum class PingReason { NONE, DIRECT_MESSAGE, MENTION }
  *
  * Two signals are used:
  *  - Mention: any of the user's keywords appears in the notification text.
- *  - Direct message: the notification is a 1:1 conversation (not a group). On
- *    API 28+ this is read reliably from MessagingStyle's group flag; otherwise
- *    we fall back to a best-effort heuristic.
+ *  - Direct message: the notification is a 1:1 conversation (not a group). Read
+ *    from MessagingStyle's group flag when present; for LINE WORKS (which doesn't
+ *    set it) we compare the conversation title against the sender in the text.
  */
 class NotificationClassifier(private val settings: SettingsStore) {
 
@@ -53,19 +53,42 @@ class NotificationClassifier(private val settings: SettingsStore) {
     }
 
     private fun isDirectMessage(n: Notification, extras: Bundle): Boolean {
-        // Most modern messaging apps (incl. LINE WORKS) use MessagingStyle, which
-        // exposes whether the conversation is a group.
+        // Reliable when the app uses MessagingStyle, which exposes the group flag.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
             extras.containsKey(Notification.EXTRA_IS_GROUP_CONVERSATION)
         ) {
             return !extras.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION, false)
         }
 
-        // Fallback: a message-category notification with no separate conversation
-        // (group) title is most likely a 1:1 chat.
+        // LINE WORKS uses BigTextStyle and never sets the group flag. It puts the
+        // CONVERSATION name in the title (e.g. "[Message] Kai Brieske") and
+        // "<sender> : <message>" in the text (e.g. "Kai Brieske : hi"). In a 1:1
+        // chat the conversation name IS the sender; in a group it's the group name,
+        // which differs from the sender. So it's a DM when title == sender.
+        val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
+        val text = (extras.getCharSequence(Notification.EXTRA_TEXT)
+            ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT))?.toString().orEmpty()
+
+        val conversationName = stripLabelPrefix(title)
+        val sender = senderOf(text)
+        if (conversationName.isNotBlank() && sender.isNotBlank()) {
+            return conversationName.equals(sender, ignoreCase = true)
+        }
+
+        // Last resort if the text can't be parsed: a message with no group title.
         val isMessage = n.category == Notification.CATEGORY_MESSAGE
         val convoTitle = extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)
         return isMessage && convoTitle.isNullOrBlank()
+    }
+
+    /** Removes a leading bracketed label like "[Message] " from a title. */
+    private fun stripLabelPrefix(title: String): String =
+        title.replace(Regex("^\\s*\\[[^\\]]*\\]\\s*"), "").trim()
+
+    /** The sender before the first ':' in "<sender> : <message>", or "" if none. */
+    private fun senderOf(text: String): String {
+        val idx = text.indexOf(':')
+        return if (idx > 0) text.substring(0, idx).trim() else ""
     }
 
     /** Flattens MessagingStyle messages (sender + text) into a searchable string. */
