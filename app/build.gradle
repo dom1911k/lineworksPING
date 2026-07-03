@@ -26,7 +26,22 @@ android {
         buildConfig true
     }
 
+    // A committed, fixed debug key so every build (CI or local) is signed with the
+    // SAME signature. This lets the in-app updater install new APKs over the top
+    // instead of Android rejecting them for a signature mismatch.
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
