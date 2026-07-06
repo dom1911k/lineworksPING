@@ -45,10 +45,12 @@ class NotificationClassifier(private val settings: SettingsStore) {
     }
 
     private fun matchesMention(blob: String): Boolean {
-        val haystack = blob.lowercase()
         return settings.keywords.any { kw ->
-            val needle = if (settings.requireAtSymbol) "@$kw" else kw
-            haystack.contains(needle.lowercase())
+            val body = if (settings.requireAtSymbol) "@" + Regex.escape(kw) else Regex.escape(kw)
+            // Whole-word, Unicode-aware, case-insensitive so a short keyword like
+            // "Dom" matches the word "Dom" but not "freedom", "random", "domain".
+            val regex = Regex("(?<![\\p{L}\\p{N}])$body(?![\\p{L}\\p{N}])", RegexOption.IGNORE_CASE)
+            regex.containsMatchIn(blob)
         }
     }
 
