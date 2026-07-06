@@ -1,6 +1,8 @@
 package com.dominic.lineworksping
 
 import android.app.Notification
+import android.content.Intent
+import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -57,6 +59,12 @@ class PingNotificationListenerService : NotificationListenerService() {
             if (monitored && !isSummary && reason != PingReason.NONE) {
                 pinged = Notifier.notifyImportant(this, settings, title, text)
                 Log.d(TAG, "Important notification ($reason) from $pkg, shown=$pinged")
+                // The notification's full-screen intent only fires when the screen is
+                // off/locked. With "Display over other apps" granted we can launch the
+                // takeover directly, so it shows even while the phone is in use.
+                if (settings.fullScreenAlert && Settings.canDrawOverlays(this)) {
+                    launchFullScreenAlert(title, text)
+                }
             }
 
             val decision = when {
@@ -114,6 +122,19 @@ class PingNotificationListenerService : NotificationListenerService() {
             appendLine("subText: ${e.getCharSequence(Notification.EXTRA_SUB_TEXT)}")
             appendLine("conversationTitle: ${e.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)}")
         }.trimEnd()
+    }
+
+    private fun launchFullScreenAlert(title: String, text: String) {
+        try {
+            startActivity(
+                Intent(this, AlertActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .putExtra(AlertActivity.EXTRA_TITLE, title)
+                    .putExtra(AlertActivity.EXTRA_TEXT, text)
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to launch full-screen alert", e)
+        }
     }
 
     private fun appLabel(pkg: String): String = try {

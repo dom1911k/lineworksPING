@@ -41,6 +41,9 @@
     <string name="fsi_allowed">Full-screen alerts: allowed ✓</string>
     <string name="fsi_needed">Full-screen alerts: not allowed — tap below to allow (Android 14+).</string>
     <string name="allow_fullscreen">Allow full-screen alerts</string>
+    <string name="overlay_granted">Display over other apps: allowed ✓ — the alert pops over the screen even while you use the phone.</string>
+    <string name="overlay_needed">Display over other apps: NOT allowed — without this, the full-screen alert only appears when the screen is off/locked. Tap below to allow it while using the phone.</string>
+    <string name="allow_overlay">Allow display over other apps</string>
     <string name="alert_dismiss">Dismiss</string>
     <string name="alert_color_label">Colour style</string>
     <string name="alert_speed_label">Colour-cycling speed</string>

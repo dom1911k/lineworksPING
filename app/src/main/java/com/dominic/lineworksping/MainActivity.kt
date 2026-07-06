@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
         }
         binding.btnFsiGrant.setOnClickListener { openFullScreenIntentSettings() }
+        binding.btnOverlayGrant.setOnClickListener { openOverlaySettings() }
         binding.btnPreviewAlert.setOnClickListener { previewAlert() }
         binding.btnCheckUpdate.setOnClickListener { checkForUpdate() }
     }
@@ -114,6 +115,7 @@ class MainActivity : AppCompatActivity() {
         updateNotifStatus()
         updateDndStatus()
         updateFsiStatus()
+        updateOverlayStatus()
         binding.textVersion.text = getString(R.string.current_version, BuildConfig.VERSION_NAME)
     }
 
@@ -184,6 +186,23 @@ class MainActivity : AppCompatActivity() {
                 .putExtra(AlertActivity.EXTRA_TITLE, getString(R.string.test_title))
                 .putExtra(AlertActivity.EXTRA_TEXT, getString(R.string.test_body))
         )
+    }
+
+    private fun openOverlaySettings() {
+        startActivity(
+            Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+        )
+    }
+
+    private fun updateOverlayStatus() {
+        val granted = Settings.canDrawOverlays(this)
+        binding.textOverlayStatus.text = getString(
+            if (granted) R.string.overlay_granted else R.string.overlay_needed
+        )
+        binding.btnOverlayGrant.visibility = if (granted) View.GONE else View.VISIBLE
     }
 
     private fun openFullScreenIntentSettings() {
