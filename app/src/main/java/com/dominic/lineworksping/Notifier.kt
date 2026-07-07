@@ -64,17 +64,39 @@ object Notifier {
         return channelId
     }
 
-    /** Posts an important-message heads-up notification. Returns true if it was shown. */
-    fun notifyImportant(context: Context, settings: SettingsStore, title: String, text: String): Boolean {
+    /**
+     * Posts an important-message heads-up notification. Returns true if it was shown.
+     *
+     * Tapping it fires [sourceContentIntent] — the original app's own tap action —
+     * so it opens the actual chat (e.g. in LINE WORKS). Falls back to launching the
+     * source app, then to opening this app's settings.
+     */
+    fun notifyImportant(
+        context: Context,
+        settings: SettingsStore,
+        title: String,
+        text: String,
+        sourcePackage: String? = null,
+        sourceContentIntent: PendingIntent? = null
+    ): Boolean {
         val channelId = ensureChannel(context, settings)
 
-        val contentIntent = PendingIntent.getActivity(
-            context,
-            0,
-            Intent(context, MainActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val contentIntent = sourceContentIntent
+            ?: sourcePackage?.let { pkg ->
+                context.packageManager.getLaunchIntentForPackage(pkg)?.let { launch ->
+                    PendingIntent.getActivity(
+                        context, 0, launch,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                }
+            }
+            ?: PendingIntent.getActivity(
+                context,
+                0,
+                Intent(context, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_stat_ping)

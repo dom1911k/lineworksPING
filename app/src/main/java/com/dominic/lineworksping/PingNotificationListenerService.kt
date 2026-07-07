@@ -21,6 +21,9 @@ class PingNotificationListenerService : NotificationListenerService() {
     private lateinit var classifier: NotificationClassifier
     private var tts: TtsSpeaker? = null
 
+    /** Recent sender+text signatures -> time, to drop duplicate re-posts. */
+    private val recentPings = HashMap<String, Long>()
+
     override fun onCreate() {
         super.onCreate()
         settings = SettingsStore(this)
@@ -71,8 +74,13 @@ class PingNotificationListenerService : NotificationListenerService() {
 
             val (title, text) = extractText(sbn)
 
-            // Count every important message that arrives (even if we then suppress it).
-            if (reason != PingReason.NONE) {
+            val important = monitored && !isSummary && reason != PingReason.NONE
+            // Apps often re-post/update the same notification, firing this twice.
+            // Ignore a repeat of the same sender+text within a short window.
+            val duplicate = important && isDuplicate(pkg, title, text)
+
+            // Count each important message once (skip duplicate re-posts).
+            if (important && !duplicate) {
                 settings.recordImportant(reason == PingReason.MENTION, LocalDate.now().toEpochDay())
             }
 
@@ -82,8 +90,10 @@ class PingNotificationListenerService : NotificationListenerService() {
             val suppressed = suppressedByCharging || suppressedByWifi
 
             var pinged = false
-            if (monitored && !isSummary && reason != PingReason.NONE && !suppressed) {
-                pinged = Notifier.notifyImportant(this, settings, title, text)
+            if (important && !duplicate && !suppressed) {
+                pinged = Notifier.notifyImportant(
+                    this, settings, title, text, pkg, sbn.notification?.contentIntent
+                )
                 Log.d(TAG, "Important notification ($reason) from $pkg, shown=$pinged")
                 // The notification's full-screen intent only fires when the screen is
                 // off/locked. With "Display over other apps" granted we can launch the
@@ -100,6 +110,7 @@ class PingNotificationListenerService : NotificationListenerService() {
                 !monitored -> getString(R.string.decision_not_monitored)
                 isSummary -> getString(R.string.decision_group_summary)
                 reason == PingReason.NONE -> getString(R.string.decision_normal)
+                duplicate -> getString(R.string.decision_duplicate)
                 suppressedByCharging -> getString(R.string.decision_charging)
                 suppressedByWifi -> getString(R.string.decision_wifi)
                 reason == PingReason.DIRECT_MESSAGE -> getString(R.string.decision_ping_dm)
@@ -154,6 +165,19 @@ class PingNotificationListenerService : NotificationListenerService() {
             appendLine("subText: ${e.getCharSequence(Notification.EXTRA_SUB_TEXT)}")
             appendLine("conversationTitle: ${e.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)}")
         }.trimEnd()
+    }
+
+    /** True if this exact sender+text was already pinged within the dedupe window. */
+    private fun isDuplicate(pkg: String, title: String, text: String): Boolean {
+        val signature = "$pkg$title$text"
+        val now = System.currentTimeMillis()
+        val previous = recentPings[signature]
+        val duplicate = previous != null && (now - previous) < DEDUPE_WINDOW_MS
+        if (!duplicate) recentPings[signature] = now
+        if (recentPings.size > 200) {
+            recentPings.entries.removeAll { now - it.value > 60_000L }
+        }
+        return duplicate
     }
 
     /** True if connected to a configured office Wi-Fi (fails open if SSID unknown). */
@@ -217,5 +241,6 @@ class PingNotificationListenerService : NotificationListenerService() {
 
     companion object {
         private const val TAG = "LineWorksPing"
+        private const val DEDUPE_WINDOW_MS = 8_000L
     }
 }

@@ -135,6 +135,7 @@
     <string name="decision_normal">normal — no ping</string>
     <string name="decision_charging">important, but suppressed (charging)</string>
     <string name="decision_wifi">important, but suppressed (office Wi-Fi)</string>
+    <string name="decision_duplicate">duplicate re-post — ignored</string>
 
     <string name="channel_name">Important messages</string>
     <string name="channel_desc">Heads-up alerts for direct messages and @mentions.</string>
