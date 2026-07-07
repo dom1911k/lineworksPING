@@ -33,6 +33,22 @@
             android:text="@string/enable_app"
             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/tile_hint"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddTile"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/add_tile" />
+
         <!-- Step 1: notification access + pop-up permission -->
         <TextView
             style="@style/SectionHeader"

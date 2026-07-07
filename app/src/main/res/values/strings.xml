@@ -3,6 +3,11 @@
     <string name="app_tagline">Pops up a notification and plays a sound only when a message actually matters — a DM or an @mention of you.</string>
 
     <string name="enable_app">Enabled</string>
+    <string name="tile_hint">Add a Quick Settings tile so you can pause and resume pings from the notification shade — handy for switching off when you sit down at your desk.</string>
+    <string name="add_tile">Add quick on/off tile</string>
+    <string name="add_tile_manual">Pull down Quick Settings, tap the edit (pencil) icon, and drag the “LINE WORKS Ping” tile into your active tiles.</string>
+    <string name="tile_on">On</string>
+    <string name="tile_off">Paused (at desk)</string>
 
     <string name="section_access">1. Notification access</string>
     <string name="open_access_settings">Open access settings</string>

@@ -2,9 +2,11 @@ package com.dominic.lineworksping
 
 import android.Manifest
 import android.app.NotificationManager
+import android.app.StatusBarManager
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Icon
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
@@ -58,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.switchEnabled.setOnCheckedChangeListener { _, v -> settings.enabled = v }
+        binding.btnAddTile.setOnClickListener { addQuickTile() }
         binding.switchMention.setOnCheckedChangeListener { _, v -> settings.mentionEnabled = v }
         binding.switchRequireAt.setOnCheckedChangeListener { _, v -> settings.requireAtSymbol = v }
         binding.switchDm.setOnCheckedChangeListener { _, v -> settings.dmImportant = v }
@@ -186,6 +189,21 @@ class MainActivity : AppCompatActivity() {
                 .putExtra(AlertActivity.EXTRA_TITLE, getString(R.string.test_title))
                 .putExtra(AlertActivity.EXTRA_TEXT, getString(R.string.test_body))
         )
+    }
+
+    private fun addQuickTile() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val statusBar = getSystemService(StatusBarManager::class.java)
+            statusBar.requestAddTileService(
+                ComponentName(this, PingTileService::class.java),
+                getString(R.string.app_name),
+                Icon.createWithResource(this, R.drawable.ic_stat_ping),
+                { it.run() },
+                { }
+            )
+        } else {
+            Toast.makeText(this, R.string.add_tile_manual, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun openOverlaySettings() {
