@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -21,400 +21,389 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="@string/app_tagline"
             android:textAppearance="?attr/textAppearanceBodyMedium" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchEnabled"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/enable_app"
-            android:textAppearance="?attr/textAppearanceTitleMedium" />
+        <!-- Master + quick tile -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/tile_hint"
-            android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?android:attr/textColorSecondary" />
+            <LinearLayout style="@style/CardBody">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddTile"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/add_tile" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchEnabled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enable_app"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchSilenceCharging"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/rule_silence_charging" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/tile_hint"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:attr/textColorSecondary" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchOfficeWifi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/rule_office_wifi" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddTile"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/add_tile" />
 
-        <TextView
-            android:id="@+id/textWifiStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?android:attr/textColorSecondary"
-            tools:text="Currently connected to: OfficeNet" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:hint="@string/hint_ssids"
-            app:helperText="@string/help_ssids"
-            app:helperTextEnabled="true">
+        <!-- Setup status dashboard -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editOfficeSsids"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine|textNoSuggestions"
-                android:minLines="1" />
+            <LinearLayout style="@style/CardBody">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <TextView
+                    style="@style/CardTitle"
+                    android:text="@string/status_title" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnUseWifi"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/use_wifi" />
+                <TextView
+                    android:id="@+id/statusSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    tools:text="2 things need your attention" />
 
-        <!-- Step 1: notification access + pop-up permission -->
-        <TextView
-            style="@style/SectionHeader"
-            android:text="@string/section_access" />
+                <LinearLayout
+                    android:id="@+id/statusContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="vertical" />
 
-        <TextView
-            android:id="@+id/textAccessStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Notification access: not granted" />
+                <TextView
+                    android:id="@+id/textHealth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Listener: connected — last message 2 min ago" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNotifAccess"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/open_access_settings" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/textNotifStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Pop-up notifications: enabled" />
+        <!-- Apps to watch -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNotifSettings"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/open_notif_settings" />
+            <LinearLayout style="@style/CardBody">
 
-        <TextView
-            android:id="@+id/textHealth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Listener: connected — last message 2 min ago" />
+                <TextView
+                    style="@style/CardTitle"
+                    android:text="@string/section_apps" />
 
-        <!-- Step 2: which apps + diagnostics -->
-        <TextView
-            style="@style/SectionHeader"
-            android:text="@string/section_apps" />
+                <TextView
+                    android:id="@+id/textApps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    tools:text="0 apps monitored" />
 
-        <TextView
-            android:id="@+id/textApps"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="0 apps monitored" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPickApps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/choose_apps" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPickApps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_apps" />
+        <!-- What triggers a ping -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRecent"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/recent_activity" />
+            <LinearLayout style="@style/CardBody">
 
-        </LinearLayout>
+                <TextView
+                    style="@style/CardTitle"
+                    android:text="@string/section_rules" />
 
-        <!-- Step 3: what counts as important -->
-        <TextView
-            style="@style/SectionHeader"
-            android:text="@string/section_rules" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchDm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rule_dm" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchDm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/rule_dm" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchMention"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/rule_mention" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchMention"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/rule_mention" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/hint_keywords"
+                    app:helperText="@string/help_keywords"
+                    app:helperTextEnabled="true">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/hint_keywords"
-            app:helperText="@string/help_keywords"
-            app:helperTextEnabled="true">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editKeywords"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine|textNoSuggestions"
+                        android:minLines="1" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editKeywords"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine|textNoSuggestions"
-                android:minLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchRequireAt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/rule_require_at" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchRequireAt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/rule_require_at" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchLogAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/rule_log_all" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchLogAll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/rule_log_all" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Step 4: the sound -->
-        <TextView
-            style="@style/SectionHeader"
-            android:text="@string/section_sound" />
+        <!-- Alert style -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
 
-        <TextView
-            android:id="@+id/textSound"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Sound: Default" />
+            <LinearLayout style="@style/CardBody">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+                <TextView
+                    style="@style/CardTitle"
+                    android:text="@string/section_sound" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPickSound"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_sound" />
+                <TextView
+                    android:id="@+id/textSound"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    tools:text="Sound: Default" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTestSound"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/test_ping" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
 
-        </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPickSound"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/choose_sound" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchReadAloud"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/rule_read_aloud" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestSound"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/test_ping" />
 
-        <!-- Step 5: full-screen takeover alert -->
-        <TextView
-            style="@style/SectionHeader"
-            android:text="@string/section_fullscreen" />
+                </LinearLayout>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchFullScreen"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/rule_fullscreen" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchReadAloud"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/rule_read_aloud" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/alert_color_label"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="?android:attr/listDivider" />
 
-        <Spinner
-            android:id="@+id/spinnerColor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchFullScreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rule_fullscreen" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/alert_speed_label"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/alert_color_label"
+                    android:textAppearance="?attr/textAppearanceBodyMedium" />
 
-        <Spinner
-            android:id="@+id/spinnerSpeed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <Spinner
+                    android:id="@+id/spinnerColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/alert_textsize_label"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/alert_speed_label"
+                    android:textAppearance="?attr/textAppearanceBodyMedium" />
 
-        <Spinner
-            android:id="@+id/spinnerTextSize"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <Spinner
+                    android:id="@+id/spinnerSpeed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchAlertVibrate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/alert_vibrate" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/alert_textsize_label"
+                    android:textAppearance="?attr/textAppearanceBodyMedium" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchAlertPulse"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/alert_pulse" />
+                <Spinner
+                    android:id="@+id/spinnerTextSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPreviewAlert"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/preview_alert" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchAlertVibrate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/alert_vibrate" />
 
-        <TextView
-            android:id="@+id/textFsiStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Full-screen alerts: allowed" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchAlertPulse"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/alert_pulse" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFsiGrant"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/allow_fullscreen" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPreviewAlert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/preview_alert" />
 
-        <TextView
-            android:id="@+id/textOverlayStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Display over other apps: not allowed" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOverlayGrant"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/allow_overlay" />
+        <!-- Do Not Disturb -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
 
-        <!-- Step 6: Do Not Disturb -->
-        <TextView
-            style="@style/SectionHeader"
-            android:text="@string/section_dnd" />
+            <LinearLayout style="@style/CardBody">
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchBypassDnd"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/rule_bypass_dnd" />
+                <TextView
+                    style="@style/CardTitle"
+                    android:text="@string/section_dnd" />
 
-        <TextView
-            android:id="@+id/textDndStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Do Not Disturb access: not granted" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchBypassDnd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rule_bypass_dnd" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDndAccess"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/open_dnd_settings" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Step 7: updates -->
-        <TextView
-            style="@style/SectionHeader"
-            android:text="@string/section_updates" />
+        <!-- Auto-silence -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
 
-        <TextView
-            android:id="@+id/textVersion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Installed version: 1.0" />
+            <LinearLayout style="@style/CardBody">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCheckUpdate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/check_updates" />
+                <TextView
+                    style="@style/CardTitle"
+                    android:text="@string/section_silence" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchSilenceCharging"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rule_silence_charging" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchOfficeWifi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/rule_office_wifi" />
+
+                <TextView
+                    android:id="@+id/textWifiStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Currently connected to: OfficeNet" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="@string/hint_ssids"
+                    app:helperText="@string/help_ssids"
+                    app:helperTextEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editOfficeSsids"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine|textNoSuggestions"
+                        android:minLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnUseWifi"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/use_wifi" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Activity & updates -->
+        <com.google.android.material.card.MaterialCardView style="@style/Card">
+
+            <LinearLayout style="@style/CardBody">
+
+                <TextView
+                    style="@style/CardTitle"
+                    android:text="@string/section_activity" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRecent"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recent_activity" />
+
+                <TextView
+                    android:id="@+id/textVersion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    tools:text="Installed version: 1.0" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCheckUpdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/check_updates" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="24dp" />
+            android:layout_height="16dp" />
 
     </LinearLayout>
 

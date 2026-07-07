@@ -1,6 +1,7 @@
 package com.dominic.lineworksping
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.StatusBarManager
 import android.content.ComponentName
@@ -11,12 +12,15 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.text.format.DateUtils
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -24,12 +28,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import com.dominic.lineworksping.databinding.ActivityMainBinding
+import com.google.android.material.button.MaterialButton
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var settings: SettingsStore
+
+    /** One row of the "Setup status" checklist. */
+    private class Requirement(
+        val title: String,
+        val granted: Boolean,
+        val fix: (() -> Unit)?
+    )
 
     private val soundPicker = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -45,11 +57,11 @@ class MainActivity : AppCompatActivity() {
 
     private val notifPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { /* status refreshed in onResume */ }
+    ) { renderStatus() }
 
     private val locationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { updateWifiStatus() }
+    ) { updateWifiStatus(); renderStatus() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,41 +83,32 @@ class MainActivity : AppCompatActivity() {
             settings.silenceOnOfficeWifi = v
             if (v) ensureLocationPermission()
             updateWifiStatus()
+            renderStatus()
         }
-        binding.btnUseWifi.setOnClickListener { useCurrentWifi() }
-        binding.btnAddTile.setOnClickListener { addQuickTile() }
         binding.switchMention.setOnCheckedChangeListener { _, v -> settings.mentionEnabled = v }
         binding.switchRequireAt.setOnCheckedChangeListener { _, v -> settings.requireAtSymbol = v }
         binding.switchDm.setOnCheckedChangeListener { _, v -> settings.dmImportant = v }
         binding.switchLogAll.setOnCheckedChangeListener { _, v -> settings.logAllApps = v }
-        binding.switchFullScreen.setOnCheckedChangeListener { _, v -> settings.fullScreenAlert = v }
         binding.switchAlertVibrate.setOnCheckedChangeListener { _, v -> settings.alertVibrate = v }
         binding.switchAlertPulse.setOnCheckedChangeListener { _, v -> settings.alertPulse = v }
-        setupAlertSpinners()
+        binding.switchFullScreen.setOnCheckedChangeListener { _, v ->
+            settings.fullScreenAlert = v
+            renderStatus()
+        }
         binding.switchBypassDnd.setOnCheckedChangeListener { _, v ->
             settings.bypassDnd = v
             Notifier.ensureChannel(this, settings)
-            updateDndStatus()
+            renderStatus()
         }
+        setupAlertSpinners()
 
-        binding.btnNotifAccess.setOnClickListener {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-        }
-        binding.btnPickApps.setOnClickListener {
-            startActivity(Intent(this, AppPickerActivity::class.java))
-        }
-        binding.btnRecent.setOnClickListener {
-            startActivity(Intent(this, RecentActivity::class.java))
-        }
+        binding.btnAddTile.setOnClickListener { addQuickTile() }
+        binding.btnPickApps.setOnClickListener { startActivity(Intent(this, AppPickerActivity::class.java)) }
+        binding.btnRecent.setOnClickListener { startActivity(Intent(this, RecentActivity::class.java)) }
         binding.btnPickSound.setOnClickListener { openSoundPicker() }
         binding.btnTestSound.setOnClickListener { sendTestPing() }
-        binding.btnNotifSettings.setOnClickListener { openAppNotificationSettings() }
-        binding.btnDndAccess.setOnClickListener {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
-        }
-        binding.btnFsiGrant.setOnClickListener { openFullScreenIntentSettings() }
-        binding.btnOverlayGrant.setOnClickListener { openOverlaySettings() }
         binding.btnPreviewAlert.setOnClickListener { previewAlert() }
+        binding.btnUseWifi.setOnClickListener { useCurrentWifi() }
         binding.btnCheckUpdate.setOnClickListener { checkForUpdate() }
     }
 
@@ -131,13 +134,9 @@ class MainActivity : AppCompatActivity() {
         Notifier.ensureChannel(this, settings)
         updateSoundLabel()
         updateAppsLabel()
-        updateAccessStatus()
-        updateNotifStatus()
-        updateDndStatus()
-        updateFsiStatus()
-        updateOverlayStatus()
-        updateHealthStatus()
         updateWifiStatus()
+        updateHealthStatus()
+        renderStatus()
         binding.textVersion.text = getString(R.string.current_version, BuildConfig.VERSION_NAME)
     }
 
@@ -145,6 +144,129 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         settings.keywordsRaw = binding.editKeywords.text?.toString().orEmpty()
         settings.officeSsidsRaw = binding.editOfficeSsids.text?.toString().orEmpty()
+    }
+
+    // ---- Setup status dashboard ----
+
+    private fun renderStatus() {
+        val reqs = buildRequirements()
+        val missing = reqs.count { !it.granted }
+        binding.statusSummary.text = if (missing == 0) {
+            getString(R.string.status_all_set)
+        } else {
+            resources.getQuantityString(R.plurals.status_needs, missing, missing)
+        }
+        binding.statusSummary.setTextColor(if (missing == 0) COLOR_OK else COLOR_WARN)
+
+        binding.statusContainer.removeAllViews()
+        val inflater = LayoutInflater.from(this)
+        for (r in reqs) {
+            val row = inflater.inflate(R.layout.item_status, binding.statusContainer, false)
+            val icon = row.findViewById<TextView>(R.id.statusIcon)
+            icon.text = if (r.granted) "✓" else "!"
+            icon.setTextColor(if (r.granted) COLOR_OK else COLOR_WARN)
+            row.findViewById<TextView>(R.id.statusLabel).text = r.title
+            val fix = row.findViewById<MaterialButton>(R.id.statusFix)
+            if (!r.granted && r.fix != null) {
+                fix.visibility = View.VISIBLE
+                fix.setOnClickListener { r.fix.invoke() }
+            } else {
+                fix.visibility = View.GONE
+            }
+            binding.statusContainer.addView(row)
+        }
+    }
+
+    private fun buildRequirements(): List<Requirement> {
+        val nm = getSystemService(NotificationManager::class.java)
+        val list = mutableListOf<Requirement>()
+
+        list += Requirement(getString(R.string.req_access), isNotificationAccessGranted()) {
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
+        list += Requirement(
+            getString(R.string.req_popup),
+            NotificationManagerCompat.from(this).areNotificationsEnabled()
+        ) { openAppNotificationSettings() }
+        list += Requirement(getString(R.string.req_battery), isBatteryOptimizationIgnored()) {
+            requestIgnoreBattery()
+        }
+
+        if (settings.fullScreenAlert) {
+            if (Build.VERSION.SDK_INT >= 34) {
+                list += Requirement(getString(R.string.req_fsi), nm.canUseFullScreenIntent()) {
+                    openFullScreenIntentSettings()
+                }
+            }
+            list += Requirement(getString(R.string.req_overlay), Settings.canDrawOverlays(this)) {
+                openOverlaySettings()
+            }
+        }
+        if (settings.bypassDnd) {
+            list += Requirement(getString(R.string.req_dnd), nm.isNotificationPolicyAccessGranted) {
+                startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+            }
+        }
+        if (settings.silenceOnOfficeWifi) {
+            val granted = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+            list += Requirement(getString(R.string.req_location), granted) { ensureLocationPermission() }
+        }
+        return list
+    }
+
+    private fun isBatteryOptimizationIgnored(): Boolean {
+        val pm = getSystemService(PowerManager::class.java)
+        return pm.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    @SuppressLint("BatteryLife")
+    private fun requestIgnoreBattery() {
+        try {
+            startActivity(
+                Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:$packageName")
+                )
+            )
+        } catch (e: Exception) {
+            startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+        }
+    }
+
+    private fun isNotificationAccessGranted(): Boolean {
+        val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+            ?: return false
+        val me = ComponentName(this, PingNotificationListenerService::class.java)
+        return flat.split(':').any { ComponentName.unflattenFromString(it) == me }
+    }
+
+    private fun openAppNotificationSettings() {
+        startActivity(
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        )
+    }
+
+    private fun openOverlaySettings() {
+        startActivity(
+            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+        )
+    }
+
+    private fun openFullScreenIntentSettings() {
+        if (Build.VERSION.SDK_INT >= 34) {
+            try {
+                startActivity(
+                    Intent(
+                        Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
+                        Uri.parse("package:$packageName")
+                    )
+                )
+            } catch (e: Exception) {
+                openAppNotificationSettings()
+            }
+        }
     }
 
     // ---- Listener health ----
@@ -199,7 +321,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---- Sound ----
+    // ---- Sound / alert ----
 
     private fun openSoundPicker() {
         val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
@@ -216,12 +338,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendTestPing() {
         val shown = Notifier.notifyImportant(
-            this, settings,
-            getString(R.string.test_title),
-            getString(R.string.test_body)
+            this, settings, getString(R.string.test_title), getString(R.string.test_body)
         )
-        // The full-screen intent only fires when the screen is off/locked, so launch
-        // the alert directly here to preview it while the app is open.
         if (settings.fullScreenAlert) {
             startActivity(
                 Intent(this, AlertActivity::class.java)
@@ -232,6 +350,21 @@ class MainActivity : AppCompatActivity() {
         if (!shown) {
             Toast.makeText(this, R.string.test_blocked, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun updateSoundLabel() {
+        val uri = PingPlayer.resolveUri(settings)
+        val title = try {
+            RingtoneManager.getRingtone(this, uri)?.getTitle(this)
+        } catch (e: Exception) {
+            null
+        }
+        binding.textSound.text = getString(R.string.current_sound, title ?: getString(R.string.default_sound))
+    }
+
+    private fun updateAppsLabel() {
+        val count = settings.monitoredPackages.size
+        binding.textApps.text = resources.getQuantityString(R.plurals.monitored_apps, count, count)
     }
 
     private fun setupAlertSpinners() {
@@ -276,107 +409,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, R.string.add_tile_manual, Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun openOverlaySettings() {
-        startActivity(
-            Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName")
-            )
-        )
-    }
-
-    private fun updateOverlayStatus() {
-        val granted = Settings.canDrawOverlays(this)
-        binding.textOverlayStatus.text = getString(
-            if (granted) R.string.overlay_granted else R.string.overlay_needed
-        )
-        binding.btnOverlayGrant.visibility = if (granted) View.GONE else View.VISIBLE
-    }
-
-    private fun openFullScreenIntentSettings() {
-        if (Build.VERSION.SDK_INT >= 34) {
-            try {
-                startActivity(
-                    Intent(
-                        Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
-                        Uri.parse("package:$packageName")
-                    )
-                )
-            } catch (e: Exception) {
-                openAppNotificationSettings()
-            }
-        }
-    }
-
-    private fun updateFsiStatus() {
-        val allowed = if (Build.VERSION.SDK_INT >= 34) {
-            getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
-        } else {
-            true
-        }
-        binding.textFsiStatus.text = getString(
-            if (allowed) R.string.fsi_allowed else R.string.fsi_needed
-        )
-        binding.btnFsiGrant.visibility =
-            if (Build.VERSION.SDK_INT >= 34 && !allowed) View.VISIBLE else View.GONE
-    }
-
-    private fun updateSoundLabel() {
-        val uri = PingPlayer.resolveUri(settings)
-        val title = try {
-            RingtoneManager.getRingtone(this, uri)?.getTitle(this)
-        } catch (e: Exception) {
-            null
-        }
-        binding.textSound.text = getString(R.string.current_sound, title ?: getString(R.string.default_sound))
-    }
-
-    // ---- Status helpers ----
-
-    private fun updateAppsLabel() {
-        val count = settings.monitoredPackages.size
-        binding.textApps.text = resources.getQuantityString(R.plurals.monitored_apps, count, count)
-    }
-
-    private fun updateAccessStatus() {
-        val granted = isNotificationAccessGranted()
-        binding.textAccessStatus.text = getString(
-            if (granted) R.string.access_granted else R.string.access_not_granted
-        )
-    }
-
-    private fun updateNotifStatus() {
-        val enabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
-        binding.textNotifStatus.text = getString(
-            if (enabled) R.string.notif_enabled else R.string.notif_disabled
-        )
-    }
-
-    private fun updateDndStatus() {
-        val nm = getSystemService(NotificationManager::class.java)
-        val granted = nm.isNotificationPolicyAccessGranted
-        binding.textDndStatus.text = getString(
-            when {
-                !settings.bypassDnd -> R.string.dnd_off
-                granted -> R.string.dnd_granted
-                else -> R.string.dnd_needed
-            }
-        )
-    }
-
-    private fun isNotificationAccessGranted(): Boolean {
-        val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
-            ?: return false
-        val me = ComponentName(this, PingNotificationListenerService::class.java)
-        return flat.split(':').any { ComponentName.unflattenFromString(it) == me }
-    }
-
-    private fun openAppNotificationSettings() {
-        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-        startActivity(intent)
     }
 
     // ---- In-app update ----
@@ -460,5 +492,10 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(this, R.string.install_failed, Toast.LENGTH_LONG).show()
         }
+    }
+
+    companion object {
+        private const val COLOR_OK = 0xFF2E7D32.toInt()
+        private const val COLOR_WARN = 0xFFEF6C00.toInt()
     }
 }

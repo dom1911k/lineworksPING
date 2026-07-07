@@ -35,13 +35,31 @@
     <string name="notif_disabled">Pop-up notifications: BLOCKED — tap below and allow notifications (and set them to pop on screen).</string>
     <string name="open_notif_settings">Notification settings</string>
 
-    <string name="section_apps">2. Apps to watch</string>
+    <string name="status_title">Setup status</string>
+    <string name="status_all_set">✓ You’re all set — everything needed is granted.</string>
+    <string name="fix">Fix</string>
+    <string name="req_access">Notification access</string>
+    <string name="req_popup">Show pop-up notifications</string>
+    <string name="req_battery">Keep running (ignore battery optimisation)</string>
+    <string name="req_fsi">Full-screen alerts (Android 14+)</string>
+    <string name="req_overlay">Display over other apps</string>
+    <string name="req_dnd">Bypass Do Not Disturb</string>
+    <string name="req_location">Location (for office Wi-Fi)</string>
+    <string name="section_silence">Auto-silence</string>
+    <string name="section_activity">Activity &amp; updates</string>
+
+    <plurals name="status_needs">
+        <item quantity="one">%d thing needs your attention</item>
+        <item quantity="other">%d things need your attention</item>
+    </plurals>
+
+    <string name="section_apps">Apps to watch</string>
     <string name="choose_apps">Choose apps</string>
     <string name="recent_activity">Recent activity</string>
     <string name="title_pick_apps">Choose apps to watch</string>
     <string name="pick_apps_hint">Tap the apps whose messages should be checked — e.g. LINE WORKS. Changes save automatically.</string>
 
-    <string name="section_rules">3. What counts as important</string>
+    <string name="section_rules">What triggers a ping</string>
     <string name="rule_dm">Direct messages (1:1 chats)</string>
     <string name="rule_mention">@mentions of my name / keywords</string>
     <string name="rule_require_at">Only match keywords written as “@keyword”</string>
@@ -49,7 +67,7 @@
     <string name="hint_keywords">Your name(s) / keywords</string>
     <string name="help_keywords">Separate multiple keywords with commas or new lines.</string>
 
-    <string name="section_sound">4. Alert sound</string>
+    <string name="section_sound">Alert &amp; sound</string>
     <string name="choose_sound">Choose sound</string>
     <string name="test_ping">Test ping</string>
     <string name="pick_sound">Choose alert sound</string>
@@ -92,7 +110,7 @@
         <item>Huge</item>
     </string-array>
 
-    <string name="section_dnd">6. Do Not Disturb</string>
+    <string name="section_dnd">Do Not Disturb</string>
     <string name="rule_bypass_dnd">Let important pings through Do Not Disturb</string>
     <string name="dnd_granted">Do Not Disturb access: granted ✓ — pings will pierce DND.</string>
     <string name="dnd_needed">Do Not Disturb access: NOT granted — tap below and allow it so pings work during DND.</string>
