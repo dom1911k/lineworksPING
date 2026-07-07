@@ -20,12 +20,14 @@ import com.dominic.lineworksping.databinding.ActivityRecentBinding
 class RecentActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRecentBinding
+    private lateinit var settings: SettingsStore
     private val adapter = EventAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRecentBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        settings = SettingsStore(this)
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = adapter
@@ -35,6 +37,10 @@ class RecentActivity : AppCompatActivity() {
             refresh()
         }
         binding.btnRefresh.setOnClickListener { refresh() }
+        binding.btnResetStats.setOnClickListener {
+            settings.resetStats()
+            refresh()
+        }
     }
 
     override fun onResume() {
@@ -46,6 +52,11 @@ class RecentActivity : AppCompatActivity() {
         val items = EventLog.snapshot()
         adapter.submit(items)
         binding.empty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+        binding.statsText.text = getString(
+            R.string.stats_summary,
+            settings.dmToday, settings.mentionToday,
+            settings.dmTotal, settings.mentionTotal
+        )
     }
 
     private inner class EventAdapter : RecyclerView.Adapter<EventAdapter.VH>() {

@@ -56,6 +56,46 @@
             android:layout_marginTop="12dp"
             android:text="@string/rule_silence_charging" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchOfficeWifi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/rule_office_wifi" />
+
+        <TextView
+            android:id="@+id/textWifiStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="Currently connected to: OfficeNet" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:hint="@string/hint_ssids"
+            app:helperText="@string/help_ssids"
+            app:helperTextEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editOfficeSsids"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:minLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUseWifi"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/use_wifi" />
+
         <!-- Step 1: notification access + pop-up permission -->
         <TextView
             style="@style/SectionHeader"
@@ -90,6 +130,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/open_notif_settings" />
+
+        <TextView
+            android:id="@+id/textHealth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            tools:text="Listener: connected — last message 2 min ago" />
 
         <!-- Step 2: which apps + diagnostics -->
         <TextView
@@ -208,6 +256,13 @@
                 android:text="@string/test_ping" />
 
         </LinearLayout>
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchReadAloud"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/rule_read_aloud" />
 
         <!-- Step 5: full-screen takeover alert -->
         <TextView

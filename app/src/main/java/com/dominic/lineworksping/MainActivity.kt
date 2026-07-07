@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -46,6 +47,10 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission()
     ) { /* status refreshed in onResume */ }
 
+    private val locationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { updateWifiStatus() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -61,6 +66,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.switchEnabled.setOnCheckedChangeListener { _, v -> settings.enabled = v }
         binding.switchSilenceCharging.setOnCheckedChangeListener { _, v -> settings.silenceWhileCharging = v }
+        binding.switchReadAloud.setOnCheckedChangeListener { _, v -> settings.readAloud = v }
+        binding.switchOfficeWifi.setOnCheckedChangeListener { _, v ->
+            settings.silenceOnOfficeWifi = v
+            if (v) ensureLocationPermission()
+            updateWifiStatus()
+        }
+        binding.btnUseWifi.setOnClickListener { useCurrentWifi() }
         binding.btnAddTile.setOnClickListener { addQuickTile() }
         binding.switchMention.setOnCheckedChangeListener { _, v -> settings.mentionEnabled = v }
         binding.switchRequireAt.setOnCheckedChangeListener { _, v -> settings.requireAtSymbol = v }
@@ -101,6 +113,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         binding.switchEnabled.isChecked = settings.enabled
         binding.switchSilenceCharging.isChecked = settings.silenceWhileCharging
+        binding.switchReadAloud.isChecked = settings.readAloud
+        binding.switchOfficeWifi.isChecked = settings.silenceOnOfficeWifi
+        binding.editOfficeSsids.setText(settings.officeSsidsRaw)
         binding.switchMention.isChecked = settings.mentionEnabled
         binding.switchRequireAt.isChecked = settings.requireAtSymbol
         binding.switchDm.isChecked = settings.dmImportant
@@ -121,12 +136,67 @@ class MainActivity : AppCompatActivity() {
         updateDndStatus()
         updateFsiStatus()
         updateOverlayStatus()
+        updateHealthStatus()
+        updateWifiStatus()
         binding.textVersion.text = getString(R.string.current_version, BuildConfig.VERSION_NAME)
     }
 
     override fun onPause() {
         super.onPause()
         settings.keywordsRaw = binding.editKeywords.text?.toString().orEmpty()
+        settings.officeSsidsRaw = binding.editOfficeSsids.text?.toString().orEmpty()
+    }
+
+    // ---- Listener health ----
+
+    private fun updateHealthStatus() {
+        val connected = isNotificationAccessGranted()
+        val last = settings.lastEventTime
+        val lastStr = if (last == 0L) {
+            getString(R.string.health_never)
+        } else {
+            DateUtils.getRelativeTimeSpanString(
+                last, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS
+            ).toString()
+        }
+        binding.textHealth.text = getString(
+            if (connected) R.string.health_ok else R.string.health_bad, lastStr
+        )
+    }
+
+    // ---- Office Wi-Fi ----
+
+    private fun ensureLocationPermission() {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            locationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    private fun useCurrentWifi() {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ensureLocationPermission()
+            return
+        }
+        val ssid = WifiInfoHelper.currentSsid(this)
+        if (ssid == null) {
+            Toast.makeText(this, R.string.wifi_read_fail, Toast.LENGTH_LONG).show()
+            return
+        }
+        val existing = binding.editOfficeSsids.text?.toString().orEmpty()
+            .split(',', '\n').map { it.trim() }.filter { it.isNotEmpty() }.toMutableList()
+        if (existing.none { it.equals(ssid, ignoreCase = true) }) existing.add(ssid)
+        binding.editOfficeSsids.setText(existing.joinToString(", "))
+        settings.officeSsidsRaw = binding.editOfficeSsids.text?.toString().orEmpty()
+        Toast.makeText(this, getString(R.string.wifi_added, ssid), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun updateWifiStatus() {
+        val ssid = WifiInfoHelper.currentSsid(this)
+        binding.textWifiStatus.text = when {
+            !settings.silenceOnOfficeWifi -> getString(R.string.wifi_off)
+            ssid != null -> getString(R.string.wifi_current, ssid)
+            else -> getString(R.string.wifi_unknown)
+        }
     }
 
     // ---- Sound ----

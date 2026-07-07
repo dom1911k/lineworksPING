@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import java.time.LocalDate
 
 /**
  * Listens to notifications posted by other apps. For each notification from a
@@ -18,27 +19,39 @@ class PingNotificationListenerService : NotificationListenerService() {
 
     private lateinit var settings: SettingsStore
     private lateinit var classifier: NotificationClassifier
+    private var tts: TtsSpeaker? = null
 
     override fun onCreate() {
         super.onCreate()
         settings = SettingsStore(this)
         classifier = NotificationClassifier(settings)
+        tts = TtsSpeaker(this)
         Notifier.ensureChannel(this, settings)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        tts?.shutdown()
+        tts = null
     }
 
     override fun onListenerConnected() {
         super.onListenerConnected()
+        settings.listenerConnected = true
         logNote(getString(R.string.log_listener_connected))
     }
 
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
+        settings.listenerConnected = false
         logNote(getString(R.string.log_listener_disconnected))
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         sbn ?: return
         try {
+            // Liveness marker (updated even when disabled) for the health indicator.
+            settings.lastEventTime = System.currentTimeMillis()
             if (!settings.enabled) return
 
             val pkg = sbn.packageName ?: return
@@ -57,11 +70,19 @@ class PingNotificationListenerService : NotificationListenerService() {
             }
 
             val (title, text) = extractText(sbn)
-            // Overnight "asleep" mode: while plugged into a charger, stay quiet.
+
+            // Count every important message that arrives (even if we then suppress it).
+            if (reason != PingReason.NONE) {
+                settings.recordImportant(reason == PingReason.MENTION, LocalDate.now().toEpochDay())
+            }
+
+            // Auto-silence conditions.
             val suppressedByCharging = settings.silenceWhileCharging && isPluggedIn()
+            val suppressedByWifi = settings.silenceOnOfficeWifi && onOfficeWifi()
+            val suppressed = suppressedByCharging || suppressedByWifi
 
             var pinged = false
-            if (monitored && !isSummary && reason != PingReason.NONE && !suppressedByCharging) {
+            if (monitored && !isSummary && reason != PingReason.NONE && !suppressed) {
                 pinged = Notifier.notifyImportant(this, settings, title, text)
                 Log.d(TAG, "Important notification ($reason) from $pkg, shown=$pinged")
                 // The notification's full-screen intent only fires when the screen is
@@ -70,6 +91,9 @@ class PingNotificationListenerService : NotificationListenerService() {
                 if (settings.fullScreenAlert && Settings.canDrawOverlays(this)) {
                     launchFullScreenAlert(title, text)
                 }
+                if (settings.readAloud) {
+                    tts?.speak(buildSpokenText(reason, title, text))
+                }
             }
 
             val decision = when {
@@ -77,6 +101,7 @@ class PingNotificationListenerService : NotificationListenerService() {
                 isSummary -> getString(R.string.decision_group_summary)
                 reason == PingReason.NONE -> getString(R.string.decision_normal)
                 suppressedByCharging -> getString(R.string.decision_charging)
+                suppressedByWifi -> getString(R.string.decision_wifi)
                 reason == PingReason.DIRECT_MESSAGE -> getString(R.string.decision_ping_dm)
                 reason == PingReason.MENTION -> getString(R.string.decision_ping_mention)
                 else -> getString(R.string.decision_normal)
@@ -129,6 +154,25 @@ class PingNotificationListenerService : NotificationListenerService() {
             appendLine("subText: ${e.getCharSequence(Notification.EXTRA_SUB_TEXT)}")
             appendLine("conversationTitle: ${e.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)}")
         }.trimEnd()
+    }
+
+    /** True if connected to a configured office Wi-Fi (fails open if SSID unknown). */
+    private fun onOfficeWifi(): Boolean {
+        val ssid = WifiInfoHelper.currentSsid(this) ?: return false
+        return settings.officeSsids.any { it.equals(ssid, ignoreCase = true) }
+    }
+
+    /** Builds a natural spoken sentence for text-to-speech. */
+    private fun buildSpokenText(reason: PingReason, title: String, text: String): String {
+        val idx = text.indexOfFirst { it == ':' || it == '：' }
+        val sender = if (idx > 0) text.substring(0, idx).trim() else title
+        val body = if (idx > 0) text.substring(idx + 1).trim() else text
+        val lead = if (reason == PingReason.MENTION) {
+            getString(R.string.tts_mention, sender)
+        } else {
+            getString(R.string.tts_dm, sender)
+        }
+        return "$lead. $body"
     }
 
     /** True if the phone is currently plugged into any charger (AC/USB/wireless). */

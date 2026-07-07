@@ -9,6 +9,23 @@
     <string name="tile_on">On</string>
     <string name="tile_off">Paused (at desk)</string>
     <string name="rule_silence_charging">Stay silent while charging (e.g. overnight)</string>
+    <string name="rule_office_wifi">Stay silent on office Wi-Fi</string>
+    <string name="hint_ssids">Office Wi-Fi network name(s)</string>
+    <string name="help_ssids">Comma- or newline-separated. Tip: connect to it and tap “Use current Wi-Fi”.</string>
+    <string name="use_wifi">Use current Wi-Fi</string>
+    <string name="wifi_off">Office Wi-Fi silencing is off.</string>
+    <string name="wifi_current">Currently connected to: %1$s</string>
+    <string name="wifi_unknown">Can’t read the Wi-Fi name — grant Location and set it to “Allow all the time” so it works in the background.</string>
+    <string name="wifi_added">Added: %1$s</string>
+    <string name="wifi_read_fail">Couldn’t read the Wi-Fi name. Connect to Wi-Fi, enable Location, then try again.</string>
+
+    <string name="rule_read_aloud">Also read the message aloud (text-to-speech)</string>
+    <string name="tts_dm">Direct message from %1$s</string>
+    <string name="tts_mention">Mention from %1$s</string>
+
+    <string name="health_ok">Listener: connected ✓ — last message %1$s</string>
+    <string name="health_bad">Listener: NOT connected — grant notification access and exclude the app from battery optimisation. Last message %1$s</string>
+    <string name="health_never">none yet</string>
 
     <string name="section_access">1. Notification access</string>
     <string name="open_access_settings">Open access settings</string>
@@ -106,6 +123,8 @@
     <string name="recent_empty">Nothing yet. Make sure notification access is granted and LINE WORKS is selected under “Apps to watch”, then send yourself a message. Turn on the troubleshoot toggle to log every app.</string>
     <string name="refresh">Refresh</string>
     <string name="clear_log">Clear</string>
+    <string name="reset_stats">Reset stats</string>
+    <string name="stats_summary">Today: %1$d DMs, %2$d mentions  ·  All-time: %3$d DMs, %4$d mentions</string>
 
     <string name="log_listener_connected">Listener connected — the app is now watching notifications.</string>
     <string name="log_listener_disconnected">Listener disconnected — notification access may have been revoked.</string>
@@ -115,6 +134,7 @@
     <string name="decision_ping_mention">PING · @mention</string>
     <string name="decision_normal">normal — no ping</string>
     <string name="decision_charging">important, but suppressed (charging)</string>
+    <string name="decision_wifi">important, but suppressed (office Wi-Fi)</string>
 
     <string name="channel_name">Important messages</string>
     <string name="channel_desc">Heads-up alerts for direct messages and @mentions.</string>

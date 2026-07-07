@@ -64,6 +64,71 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_SILENCE_CHARGING, false)
         set(v) = prefs.edit().putBoolean(KEY_SILENCE_CHARGING, v).apply()
 
+    /** Read the sender + message aloud (text-to-speech) on an important ping. */
+    var readAloud: Boolean
+        get() = prefs.getBoolean(KEY_READ_ALOUD, false)
+        set(v) = prefs.edit().putBoolean(KEY_READ_ALOUD, v).apply()
+
+    /** Suppress pings while connected to one of the configured office Wi-Fi networks. */
+    var silenceOnOfficeWifi: Boolean
+        get() = prefs.getBoolean(KEY_WIFI, false)
+        set(v) = prefs.edit().putBoolean(KEY_WIFI, v).apply()
+
+    /** Raw SSID list (comma / newline separated) treated as "office". */
+    var officeSsidsRaw: String
+        get() = prefs.getString(KEY_SSIDS, "") ?: ""
+        set(v) = prefs.edit().putString(KEY_SSIDS, v).apply()
+
+    val officeSsids: List<String>
+        get() = officeSsidsRaw.split(',', '\n').map { it.trim() }.filter { it.isNotEmpty() }
+
+    // ---- Listener health ----
+    var listenerConnected: Boolean
+        get() = prefs.getBoolean(KEY_LISTENER_CONNECTED, false)
+        set(v) = prefs.edit().putBoolean(KEY_LISTENER_CONNECTED, v).apply()
+
+    /** When the listener last saw any notification (epoch millis), 0 if never. */
+    var lastEventTime: Long
+        get() = prefs.getLong(KEY_LAST_EVENT, 0L)
+        set(v) = prefs.edit().putLong(KEY_LAST_EVENT, v).apply()
+
+    // ---- Statistics (DMs and mentions only) ----
+    var dmTotal: Int
+        get() = prefs.getInt(KEY_DM_TOTAL, 0)
+        private set(v) = prefs.edit().putInt(KEY_DM_TOTAL, v).apply()
+    var mentionTotal: Int
+        get() = prefs.getInt(KEY_MEN_TOTAL, 0)
+        private set(v) = prefs.edit().putInt(KEY_MEN_TOTAL, v).apply()
+    var dmToday: Int
+        get() = prefs.getInt(KEY_DM_TODAY, 0)
+        private set(v) = prefs.edit().putInt(KEY_DM_TODAY, v).apply()
+    var mentionToday: Int
+        get() = prefs.getInt(KEY_MEN_TODAY, 0)
+        private set(v) = prefs.edit().putInt(KEY_MEN_TODAY, v).apply()
+    private var statDay: Long
+        get() = prefs.getLong(KEY_STAT_DAY, 0L)
+        set(v) = prefs.edit().putLong(KEY_STAT_DAY, v).apply()
+
+    /** Records one important message for the stats counters, rolling over daily. */
+    fun recordImportant(isMention: Boolean, todayEpochDay: Long) {
+        if (statDay != todayEpochDay) {
+            statDay = todayEpochDay
+            dmToday = 0
+            mentionToday = 0
+        }
+        if (isMention) {
+            mentionTotal += 1
+            mentionToday += 1
+        } else {
+            dmTotal += 1
+            dmToday += 1
+        }
+    }
+
+    fun resetStats() {
+        dmTotal = 0; mentionTotal = 0; dmToday = 0; mentionToday = 0
+    }
+
     /** Troubleshooting: record every notification (not just monitored apps) in the log. */
     var logAllApps: Boolean
         get() = prefs.getBoolean(KEY_LOG_ALL, false)
@@ -110,6 +175,16 @@ class SettingsStore(context: Context) {
         private const val KEY_SOUND = "sound_uri"
         private const val KEY_BYPASS_DND = "bypass_dnd"
         private const val KEY_SILENCE_CHARGING = "silence_while_charging"
+        private const val KEY_READ_ALOUD = "read_aloud"
+        private const val KEY_WIFI = "silence_office_wifi"
+        private const val KEY_SSIDS = "office_ssids"
+        private const val KEY_LISTENER_CONNECTED = "listener_connected"
+        private const val KEY_LAST_EVENT = "last_event_time"
+        private const val KEY_DM_TOTAL = "dm_total"
+        private const val KEY_MEN_TOTAL = "mention_total"
+        private const val KEY_DM_TODAY = "dm_today"
+        private const val KEY_MEN_TODAY = "mention_today"
+        private const val KEY_STAT_DAY = "stat_day"
         private const val KEY_LOG_ALL = "log_all_apps"
         private const val KEY_FULLSCREEN = "fullscreen_alert"
         private const val KEY_ALERT_COLOR = "alert_color"
