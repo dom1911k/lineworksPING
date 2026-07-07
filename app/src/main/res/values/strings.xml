@@ -8,6 +8,7 @@
     <string name="add_tile_manual">Pull down Quick Settings, tap the edit (pencil) icon, and drag the “LINE WORKS Ping” tile into your active tiles.</string>
     <string name="tile_on">On</string>
     <string name="tile_off">Paused (at desk)</string>
+    <string name="rule_silence_charging">Stay silent while charging (e.g. overnight)</string>
 
     <string name="section_access">1. Notification access</string>
     <string name="open_access_settings">Open access settings</string>
@@ -113,6 +114,7 @@
     <string name="decision_ping_dm">PING · direct message</string>
     <string name="decision_ping_mention">PING · @mention</string>
     <string name="decision_normal">normal — no ping</string>
+    <string name="decision_charging">important, but suppressed (charging)</string>
 
     <string name="channel_name">Important messages</string>
     <string name="channel_desc">Heads-up alerts for direct messages and @mentions.</string>

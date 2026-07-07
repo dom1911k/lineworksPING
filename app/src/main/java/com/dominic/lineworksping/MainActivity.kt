@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.switchEnabled.setOnCheckedChangeListener { _, v -> settings.enabled = v }
+        binding.switchSilenceCharging.setOnCheckedChangeListener { _, v -> settings.silenceWhileCharging = v }
         binding.btnAddTile.setOnClickListener { addQuickTile() }
         binding.switchMention.setOnCheckedChangeListener { _, v -> settings.mentionEnabled = v }
         binding.switchRequireAt.setOnCheckedChangeListener { _, v -> settings.requireAtSymbol = v }
@@ -99,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.switchEnabled.isChecked = settings.enabled
+        binding.switchSilenceCharging.isChecked = settings.silenceWhileCharging
         binding.switchMention.isChecked = settings.mentionEnabled
         binding.switchRequireAt.isChecked = settings.requireAtSymbol
         binding.switchDm.isChecked = settings.dmImportant

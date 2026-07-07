@@ -2,6 +2,8 @@ package com.dominic.lineworksping
 
 import android.app.Notification
 import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -55,8 +57,11 @@ class PingNotificationListenerService : NotificationListenerService() {
             }
 
             val (title, text) = extractText(sbn)
+            // Overnight "asleep" mode: while plugged into a charger, stay quiet.
+            val suppressedByCharging = settings.silenceWhileCharging && isPluggedIn()
+
             var pinged = false
-            if (monitored && !isSummary && reason != PingReason.NONE) {
+            if (monitored && !isSummary && reason != PingReason.NONE && !suppressedByCharging) {
                 pinged = Notifier.notifyImportant(this, settings, title, text)
                 Log.d(TAG, "Important notification ($reason) from $pkg, shown=$pinged")
                 // The notification's full-screen intent only fires when the screen is
@@ -70,6 +75,8 @@ class PingNotificationListenerService : NotificationListenerService() {
             val decision = when {
                 !monitored -> getString(R.string.decision_not_monitored)
                 isSummary -> getString(R.string.decision_group_summary)
+                reason == PingReason.NONE -> getString(R.string.decision_normal)
+                suppressedByCharging -> getString(R.string.decision_charging)
                 reason == PingReason.DIRECT_MESSAGE -> getString(R.string.decision_ping_dm)
                 reason == PingReason.MENTION -> getString(R.string.decision_ping_mention)
                 else -> getString(R.string.decision_normal)
@@ -122,6 +129,13 @@ class PingNotificationListenerService : NotificationListenerService() {
             appendLine("subText: ${e.getCharSequence(Notification.EXTRA_SUB_TEXT)}")
             appendLine("conversationTitle: ${e.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)}")
         }.trimEnd()
+    }
+
+    /** True if the phone is currently plugged into any charger (AC/USB/wireless). */
+    private fun isPluggedIn(): Boolean {
+        val status = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val plugged = status?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
+        return plugged != 0
     }
 
     private fun launchFullScreenAlert(title: String, text: String) {

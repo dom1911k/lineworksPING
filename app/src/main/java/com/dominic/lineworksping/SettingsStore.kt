@@ -59,6 +59,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_BYPASS_DND, true)
         set(v) = prefs.edit().putBoolean(KEY_BYPASS_DND, v).apply()
 
+    /** Suppress pings while the phone is plugged into a charger (e.g. overnight). */
+    var silenceWhileCharging: Boolean
+        get() = prefs.getBoolean(KEY_SILENCE_CHARGING, false)
+        set(v) = prefs.edit().putBoolean(KEY_SILENCE_CHARGING, v).apply()
+
     /** Troubleshooting: record every notification (not just monitored apps) in the log. */
     var logAllApps: Boolean
         get() = prefs.getBoolean(KEY_LOG_ALL, false)
@@ -104,6 +109,7 @@ class SettingsStore(context: Context) {
         private const val KEY_DM = "dm_important"
         private const val KEY_SOUND = "sound_uri"
         private const val KEY_BYPASS_DND = "bypass_dnd"
+        private const val KEY_SILENCE_CHARGING = "silence_while_charging"
         private const val KEY_LOG_ALL = "log_all_apps"
         private const val KEY_FULLSCREEN = "fullscreen_alert"
         private const val KEY_ALERT_COLOR = "alert_color"

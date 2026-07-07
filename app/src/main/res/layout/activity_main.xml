@@ -49,6 +49,13 @@
             android:layout_marginTop="8dp"
             android:text="@string/add_tile" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchSilenceCharging"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/rule_silence_charging" />
+
         <!-- Step 1: notification access + pop-up permission -->
         <TextView
             style="@style/SectionHeader"
