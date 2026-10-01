@@ -24,8 +24,13 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      # Install only what the build needs. The action's default package list
+      # includes the obsolete "tools" package, which Google has removed from the
+      # SDK repository — requesting it makes sdkmanager fail.
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools platforms;android-34 build-tools;34.0.0"
 
       # Use the run number as a monotonically increasing versionCode so the
       # in-app updater can tell newer builds apart.
