@@ -20,17 +20,29 @@ class PingTileService : TileService() {
     override fun onClick() {
         super.onClick()
         val settings = SettingsStore(this)
-        settings.enabled = !settings.enabled
+        if (settings.isSnoozed()) {
+            // Tapping while temporarily paused resumes immediately.
+            Snooze.clear(this)
+            settings.enabled = true
+        } else {
+            settings.enabled = !settings.enabled
+        }
         updateTile()
     }
 
     private fun updateTile() {
         val tile = qsTile ?: return
-        val enabled = SettingsStore(this).enabled
+        val settings = SettingsStore(this)
+        val snoozed = settings.isSnoozed()
+        val enabled = settings.enabled && !snoozed
         tile.state = if (enabled) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
         tile.label = getString(R.string.app_name)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tile.subtitle = getString(if (enabled) R.string.tile_on else R.string.tile_off)
+            tile.subtitle = when {
+                snoozed -> getString(R.string.tile_snoozed, Snooze.endTime(this, settings.snoozeUntil))
+                enabled -> getString(R.string.tile_on)
+                else -> getString(R.string.tile_off)
+            }
         }
         tile.icon = Icon.createWithResource(this, R.drawable.ic_stat_ping)
         tile.updateTile()

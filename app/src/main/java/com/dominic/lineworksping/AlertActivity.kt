@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.dominic.lineworksping.databinding.ActivityAlertBinding
 
@@ -36,6 +37,8 @@ class AlertActivity : AppCompatActivity() {
         bindContent(intent)
         applyTextSize()
         binding.btnDismiss.setOnClickListener { finish() }
+        binding.btnSnoozeShort.setOnClickListener { snooze(Snooze.MINUTES_SHORT) }
+        binding.btnSnoozeLong.setOnClickListener { snooze(Snooze.MINUTES_LONG) }
 
         startColorCycle()
         if (settings.alertPulse) pulse(binding.alertTitle)
@@ -46,6 +49,17 @@ class AlertActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         bindContent(intent)
+    }
+
+    private fun snooze(minutes: Int) {
+        Snooze.pause(this, minutes)
+        val until = SettingsStore(this).snoozeUntil
+        Toast.makeText(
+            this,
+            getString(R.string.snoozed_toast, Snooze.endTime(this, until)),
+            Toast.LENGTH_LONG
+        ).show()
+        finish()
     }
 
     private fun bindContent(intent: Intent) {

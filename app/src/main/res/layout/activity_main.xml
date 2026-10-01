@@ -38,6 +38,23 @@
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                 <TextView
+                    android:id="@+id/textSnooze"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textStyle="bold"
+                    tools:text="Paused until 14:35" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnResumeNow"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/resume_now" />
+
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"

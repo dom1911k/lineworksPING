@@ -64,6 +64,14 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_SILENCE_CHARGING, false)
         set(v) = prefs.edit().putBoolean(KEY_SILENCE_CHARGING, v).apply()
 
+    /** Epoch millis until which pings are snoozed; 0 (or past) means not snoozed. */
+    var snoozeUntil: Long
+        get() = prefs.getLong(KEY_SNOOZE_UNTIL, 0L)
+        set(v) = prefs.edit().putLong(KEY_SNOOZE_UNTIL, v).apply()
+
+    /** True while a temporary snooze is still running. Auto-expires on its own. */
+    fun isSnoozed(): Boolean = System.currentTimeMillis() < snoozeUntil
+
     /** Read the sender + message aloud (text-to-speech) on an important ping. */
     var readAloud: Boolean
         get() = prefs.getBoolean(KEY_READ_ALOUD, false)
@@ -175,6 +183,7 @@ class SettingsStore(context: Context) {
         private const val KEY_SOUND = "sound_uri"
         private const val KEY_BYPASS_DND = "bypass_dnd"
         private const val KEY_SILENCE_CHARGING = "silence_while_charging"
+        private const val KEY_SNOOZE_UNTIL = "snooze_until"
         private const val KEY_READ_ALOUD = "read_aloud"
         private const val KEY_WIFI = "silence_office_wifi"
         private const val KEY_SSIDS = "office_ssids"

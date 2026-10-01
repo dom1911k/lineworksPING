@@ -103,6 +103,10 @@ class MainActivity : AppCompatActivity() {
         setupAlertSpinners()
 
         binding.btnAddTile.setOnClickListener { addQuickTile() }
+        binding.btnResumeNow.setOnClickListener {
+            Snooze.clear(this)
+            updateSnoozeStatus()
+        }
         binding.btnPickApps.setOnClickListener { startActivity(Intent(this, AppPickerActivity::class.java)) }
         binding.btnRecent.setOnClickListener { startActivity(Intent(this, RecentActivity::class.java)) }
         binding.btnPickSound.setOnClickListener { openSoundPicker() }
@@ -136,6 +140,7 @@ class MainActivity : AppCompatActivity() {
         updateAppsLabel()
         updateWifiStatus()
         updateHealthStatus()
+        updateSnoozeStatus()
         renderStatus()
         binding.textVersion.text = getString(R.string.current_version, BuildConfig.VERSION_NAME)
     }
@@ -266,6 +271,19 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 openAppNotificationSettings()
             }
+        }
+    }
+
+    // ---- Snooze ----
+
+    private fun updateSnoozeStatus() {
+        val snoozed = settings.isSnoozed()
+        binding.textSnooze.visibility = if (snoozed) View.VISIBLE else View.GONE
+        binding.btnResumeNow.visibility = if (snoozed) View.VISIBLE else View.GONE
+        if (snoozed) {
+            binding.textSnooze.text =
+                getString(R.string.snooze_status, Snooze.endTime(this, settings.snoozeUntil))
+            binding.textSnooze.setTextColor(COLOR_WARN)
         }
     }
 

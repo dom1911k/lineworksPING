@@ -89,8 +89,12 @@
             </intent-filter>
         </service>
 
-        <!-- Serves the downloaded APK to the system installer. -->
-        <provider
+        <!-- Handles the "Pause 20 min / 1 hour" notification actions. -->
+        <receiver
+            android:name=".SnoozeReceiver"
+            android:exported="false" />
+
+        <!-- Serves the downloaded APK to the system installer. -->        <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"

@@ -98,6 +98,8 @@ object Notifier {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
+        val notificationId = idGenerator.incrementAndGet()
+
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_stat_ping)
             .setContentTitle(title.ifBlank { context.getString(R.string.app_name) })
@@ -113,6 +115,17 @@ object Notifier {
             .setSound(PingPlayer.resolveUri(settings))
             .setVibrate(vibration)
             .setDefaults(NotificationCompat.DEFAULT_LIGHTS)
+            // Temporary pause that expires on its own, so it can't be left off.
+            .addAction(
+                R.drawable.ic_stat_ping,
+                context.getString(R.string.snooze_short),
+                snoozeIntent(context, Snooze.MINUTES_SHORT, notificationId)
+            )
+            .addAction(
+                R.drawable.ic_stat_ping,
+                context.getString(R.string.snooze_long),
+                snoozeIntent(context, Snooze.MINUTES_LONG, notificationId)
+            )
 
         // Full-screen takeover: launches AlertActivity, and pops over the lock screen.
         if (settings.fullScreenAlert) {
@@ -130,11 +143,25 @@ object Notifier {
 
         return try {
             if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
-            NotificationManagerCompat.from(context).notify(idGenerator.incrementAndGet(), builder.build())
+            NotificationManagerCompat.from(context).notify(notificationId, builder.build())
             true
         } catch (e: SecurityException) {
             // POST_NOTIFICATIONS not granted (Android 13+); nothing we can do here.
             false
         }
+    }
+
+    /** A broadcast that pauses pings for [minutes] and clears this notification. */
+    private fun snoozeIntent(context: Context, minutes: Int, notificationId: Int): PendingIntent {
+        val intent = Intent(context, SnoozeReceiver::class.java)
+            .setAction("${context.packageName}.SNOOZE_$minutes")
+            .putExtra(SnoozeReceiver.EXTRA_MINUTES, minutes)
+            .putExtra(SnoozeReceiver.EXTRA_NOTIF_ID, notificationId)
+        return PendingIntent.getBroadcast(
+            context,
+            notificationId * 100 + minutes,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 }

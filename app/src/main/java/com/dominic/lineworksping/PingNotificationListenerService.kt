@@ -87,7 +87,8 @@ class PingNotificationListenerService : NotificationListenerService() {
             // Auto-silence conditions.
             val suppressedByCharging = settings.silenceWhileCharging && isPluggedIn()
             val suppressedByWifi = settings.silenceOnOfficeWifi && onOfficeWifi()
-            val suppressed = suppressedByCharging || suppressedByWifi
+            val suppressedBySnooze = settings.isSnoozed()
+            val suppressed = suppressedByCharging || suppressedByWifi || suppressedBySnooze
 
             var pinged = false
             if (important && !duplicate && !suppressed) {
@@ -111,6 +112,7 @@ class PingNotificationListenerService : NotificationListenerService() {
                 isSummary -> getString(R.string.decision_group_summary)
                 reason == PingReason.NONE -> getString(R.string.decision_normal)
                 duplicate -> getString(R.string.decision_duplicate)
+                suppressedBySnooze -> getString(R.string.decision_snoozed)
                 suppressedByCharging -> getString(R.string.decision_charging)
                 suppressedByWifi -> getString(R.string.decision_wifi)
                 reason == PingReason.DIRECT_MESSAGE -> getString(R.string.decision_ping_dm)

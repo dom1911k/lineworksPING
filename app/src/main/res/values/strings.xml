@@ -8,6 +8,12 @@
     <string name="add_tile_manual">Pull down Quick Settings, tap the edit (pencil) icon, and drag the “LINE WORKS Ping” tile into your active tiles.</string>
     <string name="tile_on">On</string>
     <string name="tile_off">Paused (at desk)</string>
+    <string name="tile_snoozed">Paused until %1$s</string>
+    <string name="snooze_short">Pause 20 min</string>
+    <string name="snooze_long">Pause 1 hour</string>
+    <string name="snoozed_toast">Pings paused until %1$s — they resume automatically.</string>
+    <string name="snooze_status">⏸ Paused until %1$s (resumes automatically)</string>
+    <string name="resume_now">Resume now</string>
     <string name="rule_silence_charging">Stay silent while charging (e.g. overnight)</string>
     <string name="rule_office_wifi">Stay silent on office Wi-Fi</string>
     <string name="hint_ssids">Office Wi-Fi network name(s)</string>
@@ -154,6 +160,7 @@
     <string name="decision_charging">important, but suppressed (charging)</string>
     <string name="decision_wifi">important, but suppressed (office Wi-Fi)</string>
     <string name="decision_duplicate">duplicate re-post — ignored</string>
+    <string name="decision_snoozed">important, but suppressed (paused)</string>
 
     <string name="channel_name">Important messages</string>
     <string name="channel_desc">Heads-up alerts for direct messages and @mentions.</string>
